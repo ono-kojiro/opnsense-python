@@ -3,6 +3,7 @@ import pytest
 from dotenv import load_dotenv
 from opnsense.client import OPNsenseClient
 from opnsense.firewall import FirewallAPI
+from opnsense.interfaces import InterfacesAPI
 
 
 # プロジェクトルートの .env を読み込む
@@ -36,4 +37,8 @@ def opnsense_client(opnsense_credentials):
 @pytest.fixture
 def firewall_api(opnsense_client):
     return FirewallAPI(opnsense_client)
+
+@pytest.fixture
+def interfaces_api(opnsense_client):
+    return InterfacesAPI(opnsense_client)
 

@@ -1,18 +1,60 @@
+from opnsense.client import OPNsenseClient
 from opnsense.interfaces import InterfacesAPI
 
+from pprint import pprint
 
-def test_list_interfaces(opnsense_client):
-    api = InterfacesAPI(opnsense_client)
 
-    result = api.list_interfaces()
+def test_interfaces_overview(interfaces_api):
+    data = interfaces_api.overview.interfaces_info()
+    assert isinstance(data, dict)
 
-    # overview/interfaces_info の返却構造に合わせる
-    assert "rows" in result
-    assert isinstance(result["rows"], list)
-    assert len(result["rows"]) > 0
 
-    # インターフェース名一覧を取得
-    keys = api.get_interface_keys()
-    assert isinstance(keys, list)
-    assert len(keys) > 0
+def test_interfaces_settings(interfaces_api):
+    data = interfaces_api.settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_bridge_settings(interfaces_api):
+    data = interfaces_api.bridge_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_gif_settings(interfaces_api):
+    data = interfaces_api.gif_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_gre_settings(interfaces_api):
+    data = interfaces_api.gre_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_lagg_settings(interfaces_api):
+    data = interfaces_api.lagg_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_loopback_settings(interfaces_api):
+    data = interfaces_api.loopback_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_neighbor_settings(interfaces_api):
+    data = interfaces_api.neighbor_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_vip_settings(interfaces_api):
+    data = interfaces_api.vip_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_vlan_settings(interfaces_api):
+    data = interfaces_api.vlan_settings.get()
+    assert isinstance(data, dict)
+
+
+def test_interfaces_vxlan_settings(interfaces_api):
+    data = interfaces_api.vxlan_settings.get()
+    assert isinstance(data, dict)
 
