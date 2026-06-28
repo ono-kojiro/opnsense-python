@@ -1,35 +1,29 @@
 from opnsense.client import OPNsenseClient
 
+# controller modules
+from .alias import AliasAPI
+from .category import CategoryAPI
+from .d_nat import DNatAPI
+from .filter import FilterAPI
+from .group import GroupAPI
+from .npt import NptAPI
+from .source_nat import SourceNatAPI
+
 class FirewallAPI:
     """
-    Firewall Filter API wrapper.
+    OPNsense Firewall API (module: firewall)
+    Controller をまとめる集約クラス。
     """
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def list_rules(self):
-        """
-        Get all firewall filter rules.
-        """
-        return self.client.get("/api/firewall/filter/get")
-
-    def add_rule(self, rule_data: dict):
-        """
-        Add a new firewall rule.
-        """
-        return self.client.post("/api/firewall/filter/addRule", json=rule_data)
-
-    def delete_rule(self, uuid: str):
-        """
-        Delete a firewall rule by UUID.
-        """
-        return self.client.post(f"/api/firewall/filter/delRule/{uuid}")
-
-    def toggle_rule(self, uuid: str):
-        """
-        Enable/disable a firewall rule.
-        """
-        return self.client.post(f"/api/firewall/filter/toggleRule/{uuid}")
-
-
+        # controller instances
+        self.alias = AliasAPI(client)
+        self.category = CategoryAPI(client)
+        self.d_nat = DNatAPI(client)
+        self.filter = FilterAPI(client)
+        self.group = GroupAPI(client)
+        self.npt = NptAPI(client)
+        self.source_nat = SourceNatAPI(client)
+        

@@ -24,7 +24,6 @@ def opnsense_credentials():
         "base_url": base_url,
     }
 
-
 @pytest.fixture
 def opnsense_client(opnsense_credentials):
     return OPNsenseClient(
@@ -34,8 +33,7 @@ def opnsense_client(opnsense_credentials):
         verify_ssl=True,
     )
 
-
 @pytest.fixture
-def firewall(opnsense_client):
+def firewall_api(opnsense_client):
     return FirewallAPI(opnsense_client)
 
