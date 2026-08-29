@@ -22,6 +22,9 @@ from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
 from opnsense.utils.category import category_add, category_clean, category_list
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 load_dotenv(dotenv_path=".env")
 
 from pprint import pprint
@@ -53,6 +56,7 @@ def main() :
         sys.exit(2)
 
     output = None
+    verify_ssl = False
 
     for option, arg in options:
         if option in ("-v", "-h", "--help"):
@@ -60,6 +64,8 @@ def main() :
             sys.exit(0)
         elif option in ("-o", "--output"):
             output = arg
+        elif option in ("--verify-ssl"):
+            verify_ssl = bool(arg)
         else:
             assert False, "unknown option"
 
@@ -76,7 +82,7 @@ def main() :
         base_url=base_url,
         key=key,
         secret=secret,
-        verify_ssl=True,
+        verify_ssl=verify_ssl,
     )
 
     funcs = {
