@@ -60,12 +60,12 @@ class AliasAPI:
         """
         return self.client.post(f"/api/firewall/alias/reconfigure")
 
-    def add(self, alias_data: dict):
+    def add_item(self, alias_data: dict):
         """
         Add alias.
-        POST /api/firewall/alias/addAlias
+        POST /api/firewall/alias/add_item
         """
-        return self.client.post("/api/firewall/alias/addAlias", json=alias_data)
+        return self.client.post("/api/firewall/alias/add_item", json=alias_data)
 
     def set(self, uuid: str, alias_data: dict):
         """

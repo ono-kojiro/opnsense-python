@@ -15,6 +15,9 @@ $ opncli firewall alias list_network_aliases
 $ opncli firewall alias list_user_groups
 $ opncli firewall alias list_reconfigure
 $ opncli firewall alias search_item
+
+$ opncli firewall alias add_item name=myalias \
+    type=host content=192.168.1.10 enabled=1 description="hoge"
 ```
 
 ### firewall::category
