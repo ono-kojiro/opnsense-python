@@ -11,7 +11,7 @@ class CategoryAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def get(self):
+    def get(self, json=None):
         """
         Get categories.
         GET /api/firewall/category/get
@@ -25,12 +25,12 @@ class CategoryAPI:
         """
         return self.client.post("/api/firewall/category/searchCategory", json=query or {})
 
-    def add(self, data: dict):
+    def add_item(self, data: dict):
         """
         Add category.
-        POST /api/firewall/category/addCategory
+        POST /api/firewall/category/add_item
         """
-        return self.client.post("/api/firewall/category/addCategory", json=data)
+        return self.client.post("/api/firewall/category/add_item", json=data)
 
     def set(self, uuid: str, data: dict):
         """
