@@ -32,6 +32,9 @@ class CategoryAPI:
         """
         return self.client.post("/api/firewall/category/add_item", json=data)
 
+    def add(self, data):
+        return self.add_item(data)
+
     def set(self, data: dict):
         """
         Update category.
