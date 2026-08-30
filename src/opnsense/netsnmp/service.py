@@ -20,7 +20,7 @@ class NetSnmpServiceAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def reconfigure(self):
+    def reconfigure(self, json=None):
         """
         Execute snmp service reconfigure
         POST /api/netsnmp/service/reconfigure
