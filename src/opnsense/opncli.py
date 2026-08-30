@@ -22,7 +22,8 @@ from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
 from opnsense.utils.category import category_add, category_clean, category_list
 
-from opnsense.netsnmp.general import netsnmp_get
+from opnsense.netsnmp.general import netsnmp_get, netsnmp_set
+from opnsense.netsnmp.service import netsnmp_reconfigure
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -96,6 +97,8 @@ def main() :
         'rule-clean': rule_clean,
         'category-list': category_list,
         'netsnmp-get': netsnmp_get,
+        'netsnmp-set': netsnmp_set,
+        'netsnmp-reconfigure': netsnmp_reconfigure,
     }
 
     if len(args) == 0:

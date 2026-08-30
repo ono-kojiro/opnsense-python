@@ -41,8 +41,13 @@ class OPNsenseClient:
 
     def get(self, path: str):
         return self._request("GET", path)
+    
+    def set(self, path: str, json=None):
+        return self._request("POST", path, json=json)
 
     def post(self, path: str, json=None):
         return self._request("POST", path, json=json)
 
+    def reconfigure(self, path: str, json=None):
+        return self._request("POST", path, json=json)
 
