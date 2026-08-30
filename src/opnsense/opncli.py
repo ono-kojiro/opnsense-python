@@ -40,11 +40,14 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 load_dotenv(dotenv_path=".env")
 
+import logging
+logger = logging.getLogger(__name__)
+
 from pprint import pprint
 
 def usage():
     prog = os.path.basename(sys.argv[0])
-    print('usage: {0} COMMAND [OPTIONS]'.format(prog))
+    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
 
 def read_yaml(filepath):
     fp = open(filepath, mode="r", encoding="utf-8")
@@ -65,29 +68,52 @@ def find_api_classes(base_dir: str):
                 if re.search(r'API$', node.name) :
                     classes[node.name] = str(rel)
 
-
     return classes
 
-def import_api_classes(name, path):
+def find_api_modules(base_dir: str):
+    modules = {}
+
+    for pyfile in pathlib.Path(base_dir).rglob("*.py"):
+        rel = pyfile.relative_to(PACKAGE_ROOT)
+        with open(pyfile, "r", encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=str(rel))
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                if re.search(r'API$', node.name) :
+                    modules[str(rel)] = node.name
+
+    return modules
+
+def get_module_object(filepath):
+    path = filepath
     path = re.sub(r'\.py$', '', path)
     path = re.sub(r'/', '.', path)
-    module_path = "opnsense." + path
+    import_path = "opnsense." + path
 
-    mod = importlib.import_module(module_path)
+    mod_obj = importlib.import_module(import_path)
+   
+    return mod_obj
     
-    return getattr(mod, name)
+def get_class_object(mod_obj, class_name) :
+    class_obj = getattr(mod_obj, class_name)
+    return class_obj
+    
+def get_class_method(instance, command) :
+    method = getattr(instance, command)
+    return method
+    
+def create_instance(class_obj, client):
+    instance = class_obj(client)
+    return instance
 
-def debug(client, args) :
-    classes = find_api_classes(pathlib.Path(__file__).parent)
-    #print(json.dumps(classes, indent=2))
-
-    for class_name in classes:
-        modulefile = str(classes[class_name])
-        print('DEBUG: {0}, {1}'.format(class_name, modulefile))
-
-        instance = import_api_classes(class_name, modulefile)
-        print(instance)
-
+def parse_args(args):
+    data = {}
+    for arg in args:
+        if "=" in arg:
+            key, value = arg.split("=", 1)
+            data[key] = value
+    return data
 
 def main() :
     ret = 0
@@ -95,10 +121,11 @@ def main() :
     try:
         options, args = getopt.getopt(
             sys.argv[1:],
-            "hv",
+            "hvl:",
             [
               "help",
               "version",
+              "loglevel=",
             ]
         )
     except getopt.GetoptError as err:
@@ -107,6 +134,7 @@ def main() :
 
     output = None
     verify_ssl = False
+    loglevel = 'info'
 
     for option, arg in options:
         if option in ("-v", "-h", "--help"):
@@ -116,11 +144,30 @@ def main() :
             output = arg
         elif option in ("--verify-ssl"):
             verify_ssl = bool(arg)
+        elif option in ("-l", "--loglevel"):
+            loglevel = str(arg)
         else:
             assert False, "unknown option"
 
     if ret != 0:
         sys.exit(1)
+
+    if loglevel in ('info'):
+        level = logging.INFO
+    elif loglevel in ('warn', 'warning') :
+        level = logging.WARNING
+    elif loglevel in ('debug'):
+        print('DEBUG: enable debug')
+        level = logging.DEBUG
+    elif loglevel in ('error'):
+        level = logging.ERROR
+    elif loglevel in ('critical'):
+        level = logging.CRITICAL
+    else :
+        print('ERROR: unknown loglevel, {0}'.format(loglevel), file=sys.stderr)
+        sys.exit(1)
+
+    logging.basicConfig(level=level)
 
     load_dotenv()
 
@@ -136,7 +183,6 @@ def main() :
     )
 
     funcs = {
-        'debug': debug,
         'vip-add': vip_add,
         'vip-list': vip_list,
         'vip-clean': vip_clean,
@@ -153,12 +199,52 @@ def main() :
         usage()
         sys.exit(1)
 
-    cmd = args[0]
-    if cmd in funcs:
-        funcs[cmd](client, args[1:])
-    else :
-        print('ERROR: unknown command, {0}'.format(cmd))
+    if len(args) < 3:
+        usage()
         sys.exit(1)
+
+
+    module     = args[0]
+    controller = args[1]
+    command    = args[2]
+  
+    data = None
+    if len(args) >= 4 :
+        data = {
+            controller: parse_args(args[3:])
+        }
+        print(data)
+
+    logger.debug('module     : {0}'.format(module))
+    logger.debug('controller : {0}'.format(controller))
+    logger.debug('command    : {0}'.format(command))
+
+    api_modules = find_api_modules(pathlib.Path(__file__).parent)
+    logger.debug(api_modules)
+    modulepath = module + '/' + controller + '.py'
+
+    if not modulepath in api_modules:
+        logger.error('NOT found {0} in api_modules'.format(modulepath))
+        sys.exit(1)
+
+    logger.debug('found {0} in api_modules'.format(modulepath))
+    api_class_name = api_modules[modulepath]
+    logger.debug('api_class_name is {0}'.format(api_class_name))
+
+    mod_obj = get_module_object(modulepath)
+    logger.debug(mod_obj)
+    
+    # get class object
+    class_obj = get_class_object(mod_obj, api_class_name)
+    logger.debug(class_obj)
+
+    # create instance
+    instance = create_instance(class_obj, client)
+
+    # get method
+    method = get_class_method(instance, command)
+    res = method(data)
+    print(json.dumps(res, indent=4))
 
 if __name__ == "__main__":
     main()

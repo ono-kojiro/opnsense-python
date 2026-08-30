@@ -16,7 +16,7 @@ def read_json(filepath):
     fp.close()
     return data
 
-class NetSnmpAPI:
+class NetSnmpGeneralAPI:
     """
     OPNsense NetSNMP API
     module: netsnmp
@@ -26,7 +26,7 @@ class NetSnmpAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def get(self):
+    def get(self, json=None):
         """
         Get snmp general information.
         GET /api/netsnmp/general/get
