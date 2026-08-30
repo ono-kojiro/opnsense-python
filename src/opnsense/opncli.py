@@ -4,13 +4,23 @@ import sys
 import os
 
 import uuid
+import re
 
 import getopt
 import yaml
 import json
 
-from opnsense.interfaces import InterfacesAPI
+import ast
+import pathlib
+import importlib
+
 from dotenv import load_dotenv
+
+import opnsense
+
+PACKAGE_ROOT = pathlib.Path(opnsense.__file__).parent
+
+from opnsense.interfaces import InterfacesAPI
 
 from opnsense.client import OPNsenseClient
 from opnsense.firewall import FirewallAPI
@@ -41,6 +51,43 @@ def read_yaml(filepath):
     data = yaml.safe_load(fp)
     fp.close()
     return data
+
+def find_api_classes(base_dir: str):
+    classes = {}
+
+    for pyfile in pathlib.Path(base_dir).rglob("*.py"):
+        rel = pyfile.relative_to(PACKAGE_ROOT)
+        with open(pyfile, "r", encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=str(rel))
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                if re.search(r'API$', node.name) :
+                    classes[node.name] = str(rel)
+
+
+    return classes
+
+def import_api_classes(name, path):
+    path = re.sub(r'\.py$', '', path)
+    path = re.sub(r'/', '.', path)
+    module_path = "opnsense." + path
+
+    mod = importlib.import_module(module_path)
+    
+    return getattr(mod, name)
+
+def debug(client, args) :
+    classes = find_api_classes(pathlib.Path(__file__).parent)
+    #print(json.dumps(classes, indent=2))
+
+    for class_name in classes:
+        modulefile = str(classes[class_name])
+        print('DEBUG: {0}, {1}'.format(class_name, modulefile))
+
+        instance = import_api_classes(class_name, modulefile)
+        print(instance)
+
 
 def main() :
     ret = 0
@@ -89,6 +136,7 @@ def main() :
     )
 
     funcs = {
+        'debug': debug,
         'vip-add': vip_add,
         'vip-list': vip_list,
         'vip-clean': vip_clean,
