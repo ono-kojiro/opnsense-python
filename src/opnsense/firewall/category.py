@@ -18,12 +18,12 @@ class CategoryAPI:
         """
         return self.client.get("/api/firewall/category/get")
 
-    def search(self, query: dict | None = None):
+    def search_item(self, query: dict | None = None):
         """
         Search categories.
-        POST /api/firewall/category/searchCategory
+        POST /api/firewall/category/search_item
         """
-        return self.client.post("/api/firewall/category/searchCategory", json=query or {})
+        return self.client.post("/api/firewall/category/search_item", json=query or {})
 
     def add_item(self, data: dict):
         """
@@ -32,19 +32,20 @@ class CategoryAPI:
         """
         return self.client.post("/api/firewall/category/add_item", json=data)
 
-    def set(self, uuid: str, data: dict):
+    def set(self, data: dict):
         """
         Update category.
         POST /api/firewall/category/setCategory/<uuid>
         """
-        return self.client.post(f"/api/firewall/category/setCategory/{uuid}", json=data)
+        return self.client.post(f"/api/firewall/category/set/{uuid}", json=data)
 
-    def delete(self, uuid: str):
+    def del_item(self, json=None):
         """
         Delete category.
-        POST /api/firewall/category/delCategory/<uuid>
+        POST /api/firewall/category/del_item/<uuid>
         """
-        return self.client.post(f"/api/firewall/category/delCategory/{uuid}")
+        uuid = json['category']['uuid']
+        return self.client.post(f"/api/firewall/category/del_item/{uuid}")
 
     def apply(self):
         """
