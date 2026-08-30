@@ -5,7 +5,19 @@ Designed for automation, testing, and integration scenarios, this package expose
 
 ## example
 
-### category
+### firewall::alias
+
+```
+$ opncli firewall alias get
+$ opncli firewall alias list_categories
+$ opncli firewall alias list_countries
+$ opncli firewall alias list_network_aliases
+$ opncli firewall alias list_user_groups
+$ opncli firewall alias list_reconfigure
+$ opncli firewall alias search_item
+```
+
+### firewall::category
 
 ```
 $ opncli firewall category add_item name=blue color="0000ff"

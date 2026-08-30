@@ -11,19 +11,54 @@ class AliasAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def get(self):
+    def get(self, json=None):
         """
         Get all aliases.
         GET /api/firewall/alias/get
         """
         return self.client.get("/api/firewall/alias/get")
 
-    def search(self, query: dict | None = None):
+    def search_item(self, query: dict | None = None):
         """
         Search aliases.
-        POST /api/firewall/alias/searchAlias
+        POST /api/firewall/alias/search_item
         """
-        return self.client.post("/api/firewall/alias/searchAlias", json=query or {})
+        return self.client.post("/api/firewall/alias/search_item", json=query or {})
+
+    def list_categories(self, json=None):
+        """
+        list categories
+        GET /api/firewall/alias/list_categories
+        """
+        return self.client.get("/api/firewall/alias/list_categories")
+    
+    def list_countries(self, json=None):
+        """
+        list countries
+        GET /api/firewall/alias/list_countries
+        """
+        return self.client.get("/api/firewall/alias/list_countries")
+    
+    def list_network_aliases(self, json=None):
+        """
+        list network_aliases
+        GET /api/firewall/alias/list_network_aliases
+        """
+        return self.client.get("/api/firewall/alias/list_network_aliases")
+    
+    def list_user_groups(self, json=None):
+        """
+        list user groups
+        GET /api/firewall/alias/list_user_groups
+        """
+        return self.client.get("/api/firewall/alias/list_user_groups")
+    
+    def reconfigure(self, json=None):
+        """
+        reconfigure
+        POST /api/firewall/alias/reconfigure
+        """
+        return self.client.post(f"/api/firewall/alias/reconfigure")
 
     def add(self, alias_data: dict):
         """
