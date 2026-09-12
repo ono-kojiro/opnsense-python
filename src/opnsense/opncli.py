@@ -226,8 +226,6 @@ def main() :
           controller : payload
         }
 
-    print("DEBUG: data is {0}".format(data))
-
     api_modules = find_api_modules(pathlib.Path(__file__).parent)
     logger.debug(api_modules)
     modulepath = module + '/' + controller + '.py'
