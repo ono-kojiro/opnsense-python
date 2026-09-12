@@ -21,7 +21,7 @@ class SettingsAPI:
         """
         return self.client.get(f"{self.base}/get")
 
-    def reconfigure(self):
+    def reconfigure(self, data=None):
         """
         Apply interface settings
         POST /api/interfaces/settings/reconfigure
