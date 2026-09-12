@@ -208,16 +208,25 @@ def main() :
     controller = args[1]
     command    = args[2]
   
-    data = None
+    payload = None
     if len(args) >= 4 :
-        data = {
-            controller: parse_args(args[3:])
-        }
-        print(data)
+        payload = parse_args(args[3:])
+        print(payload)
 
     logger.debug('module     : {0}'.format(module))
     logger.debug('controller : {0}'.format(controller))
     logger.debug('command    : {0}'.format(command))
+
+    if controller == 'filter' :
+        data = {
+          'rule' : payload
+        }
+    else :
+        data = {
+          controller : payload
+        }
+
+    print("DEBUG: data is {0}".format(data))
 
     api_modules = find_api_modules(pathlib.Path(__file__).parent)
     logger.debug(api_modules)

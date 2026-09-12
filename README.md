@@ -36,3 +36,21 @@ $ opncli firewall category search_item
 $ opncli firewall category del_item uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
+### firewall::filter::add_rule
+
+```
+opncli firewall filter add_rule \
+  enabled=1 \
+  action=pass \
+  interface=wan \
+  direction=in \
+  ipprotocol=inet \
+  protocol=ICMP \
+  source_net=any \
+  destination_net=wanip \
+  descr="allow PING from wan to this firewall" \
+  quick=1 \
+  statetype=keep \
+  sequence=111
+```
+

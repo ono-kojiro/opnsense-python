@@ -1,3 +1,5 @@
+# file: /src/opnsense/interfaces/settings.py
+
 from opnsense.client import OPNsenseClient
 
 
@@ -12,7 +14,7 @@ class SettingsAPI:
         self.client = client
         self.base = "/api/interfaces/settings"
 
-    def get(self):
+    def get(self, data=None):
         """
         Get interface global settings
         GET /api/interfaces/settings/get

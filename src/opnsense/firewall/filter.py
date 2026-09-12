@@ -36,9 +36,9 @@ class FilterAPI:
     def add_rule(self, rule_data: dict):
         """
         Add a new firewall rule.
-        POST /api/firewall/filter/addRule
+        POST /api/firewall/filter/add_rule
         """
-        return self.client.post("/api/firewall/filter/addRule", json=rule_data)
+        return self.client.post("/api/firewall/filter/add_rule", json=rule_data)
 
     def set_rule(self, uuid: str, rule_data: dict):
         """
@@ -67,7 +67,7 @@ class FilterAPI:
     # ───────────────────────────────────────────────
     #
 
-    def apply(self):
+    def apply(self, data=None):
         """
         Apply firewall changes.
         POST /api/firewall/filter/apply
