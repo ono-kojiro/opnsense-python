@@ -54,3 +54,16 @@ opncli firewall filter add_rule \
   sequence=111
 ```
 
+### netsnmp::user::add_user
+
+```
+$ opncli netsnmp user add_user \
+    username=myuser \
+    password=myauthpass \
+    enckey=myencpass \
+    enabled=1
+```
+
+Push "Save" button.
+
+
