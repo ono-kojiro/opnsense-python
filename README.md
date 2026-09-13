@@ -62,8 +62,9 @@ $ opncli netsnmp user add_user \
     password=myauthpass \
     enckey=myencpass \
     enabled=1
+
+# Push "Save" button.
+$ opncli netsnmp service reconfigure
+
 ```
-
-Push "Save" button.
-
 
