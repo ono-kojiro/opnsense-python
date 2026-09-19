@@ -51,7 +51,7 @@ load_dotenv(dotenv_path=".env")
 api_modules = {}
 available_controllers = {}
 
-def usage():
+def usage_simple():
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
     print('  Available Modules:')
@@ -59,6 +59,20 @@ def usage():
     for module_name in available_controllers :
         print('{0} '.format(module_name), end='')
     print('')
+
+def usage():
+    prog = os.path.basename(sys.argv[0])
+    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
+    print('  Available Module, Controller:')
+    for module_name in available_controllers :
+        print('    Module: {0}'.format(module_name))
+        print('      Controllers: ', end='')
+        for controller_name in available_controllers[module_name]:
+            print('{0}, '.format(controller_name), end='')
+        print('')
+        print('')
+    print('')
+
 
 def usage_module(module_name, controllers):
     prog = os.path.basename(sys.argv[0])
