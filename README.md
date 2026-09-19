@@ -54,6 +54,14 @@ opncli firewall filter add_rule \
   sequence=111
 ```
 
+## Core::Firmware
+
+$ opncli core firmware install pkg_name=os-net-snmp
+
+### netsnmp::user::get
+
+$ opncli netsnmp user get
+
 ### netsnmp::user::add_user
 
 ```
@@ -65,6 +73,11 @@ $ opncli netsnmp user add_user \
 
 # Push "Save" button.
 $ opncli netsnmp service reconfigure
+```
 
+### netsnmp::user::del_user
+
+```
+$ opncli netsnmp user del_user --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 

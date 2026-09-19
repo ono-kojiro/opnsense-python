@@ -26,15 +26,15 @@ class NetSnmpUserAPI:
         """
         return self.client.post("/api/netsnmp/user/add_user", json=data)
     
-    def del_user(self, data=None):
+    def del_user(self, data=None, params=None):
         """
         POST /api/netsnmp/user/del_user
         """
-        param = data['user']['uuid']
+        param = params['uuid']
         url = "/api/netsnmp/user/del_user/{0}".format(param)
         return self.client.post(url)
     
-    def get(self, json=None):
+    def get(self, json=None, params=None):
         """
         GET /api/netsnmp/user/get
         """

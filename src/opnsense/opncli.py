@@ -118,48 +118,93 @@ def parse_args(args):
 
 def main() :
     ret = 0
-
-    try:
-        options, args = getopt.gnu_getopt(
-            sys.argv[1:],
-            "hvl:",
- #           [
- #             "help",
- #             "version",
- #             "loglevel=",
- #           ]
-        )
-    except getopt.GetoptError as err:
-        print(str(err))
-        sys.exit(2)
-
+    
     output = None
     verify_ssl = False
     loglevel = 'info'
     show_help = False
 
-    for option, arg in options:
-        if option in ("-v", "-h", "--help"):
-            show_help = True
-        elif option in ("-o", "--output"):
-            output = arg
-        elif option in ("--verify-ssl"):
-            verify_ssl = bool(arg)
-        elif option in ("-l", "--loglevel"):
-            loglevel = str(arg)
-        else:
-            assert False, "unknown option"
-    
-    for i in range(len(args)):
-        print('OPT: args[i] : {0}'.format(args[i]))
+    args = []
+    payload = {}
+    params = {}
 
+    i = 1
+    while i < len(sys.argv) :
+        arg = sys.argv[i]
+        
+        # --help, -h
+        m = re.search(r'^(--help|-h)', arg)
+        if m :
+          show_help = True
+          i += 1
+          continue
+
+        # --output, -o
+        m = re.search(r'^(--output|-o)(=([^ ]+))?', arg)
+        if m :
+          if m.group(3) :
+            output = m.group(3)
+          else :
+            i += 1
+            arg = sys.argv[i]
+            output = arg
+
+          i += 1
+          continue
+        
+        # --verify-ssl
+        m = re.search(r'^(--verify-ssl)(=([^ ]+))?', arg)
+        if m :
+          if m.group(3) :
+            verify_ssl = m.group(3)
+          else :
+            i += 1
+            arg = sys.argv[i]
+            verify_ssl = arg
+          
+          i += 1
+          continue
+        
+        # --uuid
+        m = re.search(r'^(--uuid)(=([^ ]+))', arg)
+        if m :
+          key = 'uuid'
+          value = m.group(3)
+          params[key] = value
+          i += 1
+          continue
+        
+        # --loglevel, -l
+        m = re.search(r'^(--loglevel|-l)(=([^ ]+))?', arg)
+        if m :
+          if m.group(3) :
+            loglevel = m.group(3)
+          else :
+            i += 1
+            arg = sys.argv[i]
+            loglevel = arg
+          
+          i += 1
+          continue
+
+        # key=value
+        m = re.search(r'^([^-][^=]+)=([^ ]+)', arg)
+        if m :
+          key = m.group(1)
+          value = m.group(2)
+          payload[key] = value
+          i += 1
+          continue
+
+        # module or controller or command 
+        args.append(arg)
+        i += 1
+    
+    logger.debug('payload is {0}'.format(payload))
+    
     if ret != 0:
         sys.exit(1)
     
-    if show_help :
-        usage()
-        sys.exit(0)
-
     if loglevel in ('info'):
         level = logging.INFO
     elif loglevel in ('warn', 'warning') :
@@ -176,12 +221,35 @@ def main() :
         sys.exit(1)
 
     logging.basicConfig(level=level)
+    
+    if len(args) == 0:
+        logger.info('len(args) is zero')
+        usage()
+        sys.exit(1)
+
+    if len(args) < 3:
+        logger.info('len(args) is over 3')
+        usage()
+        sys.exit(1)
+
+    module     = args[0]
+    controller = args[1]
+    command    = args[2]
+    
+    
+    if show_help :
+        usage()
+        sys.exit(0)
+
+
 
     load_dotenv()
 
     key = os.getenv("OPNSENSE_KEY")
     secret = os.getenv("OPNSENSE_SECRET")
     base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
+    
+    logger.info('OPNsenseClient')
 
     client = OPNsenseClient(
         base_url=base_url,
@@ -189,24 +257,7 @@ def main() :
         secret=secret,
         verify_ssl=verify_ssl,
     )
-
-    if len(args) == 0:
-        usage()
-        sys.exit(1)
-
-    if len(args) < 3:
-        usage()
-        sys.exit(1)
-
-    module     = args[0]
-    controller = args[1]
-    command    = args[2]
   
-    payload = None
-    if len(args) >= 4 :
-        payload = parse_args(args[3:])
-        print(payload)
-
     logger.debug('module     : {0}'.format(module))
     logger.debug('controller : {0}'.format(controller))
     logger.debug('command    : {0}'.format(command))
@@ -219,6 +270,9 @@ def main() :
         data = {
           controller : payload
         }
+    
+    logger.info('Payload: {0}'.format(data))
+    logger.info('OPNsenseClient')
 
     api_modules = find_api_modules(pathlib.Path(__file__).parent)
     logger.debug(api_modules)
@@ -244,7 +298,7 @@ def main() :
 
     # get method
     method = get_class_method(instance, command)
-    res = method(data)
+    res = method(data, params)
     print(json.dumps(res, indent=4))
 
 if __name__ == "__main__":
