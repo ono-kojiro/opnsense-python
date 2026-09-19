@@ -1,7 +1,7 @@
 from opnsense.client import OPNsenseClient
 
 
-class CoreAPI:
+class CoreSystemAPI:
     """
     OPNsense Core System API
     module: core
@@ -11,13 +11,6 @@ class CoreAPI:
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
-
-    #
-    # ───────────────────────────────────────────────
-    # 基本コマンド（公式ドキュメント準拠）
-    # https://docs.opnsense.org/development/api/core/firewall.html
-    # ───────────────────────────────────────────────
-    #
 
     def status(self, data=None):
         """

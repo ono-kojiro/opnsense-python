@@ -32,18 +32,19 @@ from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
 from opnsense.utils.category import category_add, category_clean, category_list
 
-from opnsense.netsnmp.general import netsnmp_get, netsnmp_set
-from opnsense.netsnmp.service import netsnmp_reconfigure
+#from opnsense.netsnmp.general import netsnmp_get, netsnmp_set
+#from opnsense.netsnmp.service import netsnmp_reconfigure
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-load_dotenv(dotenv_path=".env")
 
 import logging
 logger = logging.getLogger(__name__)
 
 from pprint import pprint
+
+load_dotenv(dotenv_path="./config.conf")
+load_dotenv(dotenv_path=".env")
 
 def usage():
     prog = os.path.basename(sys.argv[0])
@@ -119,14 +120,14 @@ def main() :
     ret = 0
 
     try:
-        options, args = getopt.getopt(
+        options, args = getopt.gnu_getopt(
             sys.argv[1:],
             "hvl:",
-            [
-              "help",
-              "version",
-              "loglevel=",
-            ]
+ #           [
+ #             "help",
+ #             "version",
+ #             "loglevel=",
+ #           ]
         )
     except getopt.GetoptError as err:
         print(str(err))
@@ -135,11 +136,11 @@ def main() :
     output = None
     verify_ssl = False
     loglevel = 'info'
+    show_help = False
 
     for option, arg in options:
         if option in ("-v", "-h", "--help"):
-            usage()
-            sys.exit(0)
+            show_help = True
         elif option in ("-o", "--output"):
             output = arg
         elif option in ("--verify-ssl"):
@@ -148,9 +149,16 @@ def main() :
             loglevel = str(arg)
         else:
             assert False, "unknown option"
+    
+    for i in range(len(args)):
+        print('OPT: args[i] : {0}'.format(args[i]))
 
     if ret != 0:
         sys.exit(1)
+    
+    if show_help :
+        usage()
+        sys.exit(0)
 
     if loglevel in ('info'):
         level = logging.INFO
@@ -182,19 +190,6 @@ def main() :
         verify_ssl=verify_ssl,
     )
 
-    funcs = {
-        'vip-add': vip_add,
-        'vip-list': vip_list,
-        'vip-clean': vip_clean,
-        'rule-add': rule_add,
-        'rule-list': rule_list,
-        'rule-clean': rule_clean,
-        'category-list': category_list,
-        'netsnmp-get': netsnmp_get,
-        'netsnmp-set': netsnmp_set,
-        'netsnmp-reconfigure': netsnmp_reconfigure,
-    }
-
     if len(args) == 0:
         usage()
         sys.exit(1)
@@ -202,7 +197,6 @@ def main() :
     if len(args) < 3:
         usage()
         sys.exit(1)
-
 
     module     = args[0]
     controller = args[1]
