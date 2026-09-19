@@ -263,13 +263,16 @@ def main() :
     
     if ret != 0:
         sys.exit(1)
-    
+   
+    if 'loglevel' in opts:
+        loglevel = opts['loglevel']
+
     if loglevel in ('info'):
         level = logging.INFO
     elif loglevel in ('warn', 'warning') :
         level = logging.WARNING
     elif loglevel in ('debug'):
-        print('DEBUG: enable debug')
+        print('DEBUG: enable debug', file=sys.stderr)
         level = logging.DEBUG
     elif loglevel in ('error'):
         level = logging.ERROR
@@ -295,6 +298,13 @@ def main() :
     logger.debug('read dotenv file, {0}'.format(dotenv_path))
     load_dotenv(dotenv_path=dotenv_path)
 
+    if 'output' in opts:
+        output = opts['output']
+
+    if output :
+        fp = open(output, mode='w', encoding='utf-8')
+    else :
+        fp = sys.stdout
     
     if len(non_opts) == 0:
         logger.error('no module name')
@@ -355,7 +365,7 @@ def main() :
         sys.exit(1)
 
     logger.debug('found {0} in api_modules'.format(modulepath))
-    print('check {0} in api_modules... '.format(modulepath))
+    logger.debug('check {0} in api_modules...'.format(modulepath))
     api_class_name = api_modules[modulepath]
     logger.debug('api_class_name is {0}'.format(api_class_name))
 
@@ -379,7 +389,11 @@ def main() :
 
     res = method(data, params)
     if res :
-        print(json.dumps(res, indent=4))
+        fp.write(json.dumps(res, indent=4))
+        fp.write('\n')
+    
+    if output :
+        fp.close()
 
 if __name__ == "__main__":
     main()
