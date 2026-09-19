@@ -54,14 +54,11 @@ available_controllers = {}
 def usage():
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
-    print('  Available Module, Controller:')
+    print('  Available Modules:')
+    print('    ', end='')
     for module_name in available_controllers :
-        print('    Module: {0}'.format(module_name))
-        print('      Controllers: ', end='')
-        for controller_name in available_controllers[module_name]:
-            print('{0}, '.format(controller_name), end='')
-        print('')
-        print('')
+        print('{0} '.format(module_name), end='')
+    print('')
 
 def usage_module(module_name, controllers):
     prog = os.path.basename(sys.argv[0])
@@ -93,10 +90,33 @@ def usage_controller(module_name, controller_name, api_modules):
     print('  Available Command for {0}/{1}:'.format(module_name, controller_name))
     print('    ', end='')
     for name, func in inspect.getmembers(instance, inspect.ismethod) :
-        if name == '__init__' :
+        if re.search(r'^_', name) :
             continue
         print('{0} '.format(name), end='')
     print('')
+
+def usage_command(mod, ctl, cmd, api_modules):
+    prog = os.path.basename(sys.argv[0])
+    print('usage: {0} {1} {2} {3} [OPTIONS]'.format(prog, mod, ctl, cmd))
+    print('')
+    
+    modulepath = mod + '/' + ctl + '.py'
+    mod_obj = get_module_object(modulepath)
+   
+    api_class_name = api_modules[modulepath]
+    # get class object
+    class_obj = get_class_object(mod_obj, api_class_name)
+    logger.debug(class_obj)
+
+    # create instance
+    instance = create_instance(class_obj, None)
+    
+    # get help method
+    method = get_class_method(instance, '__' + cmd)
+    if method :
+        res = method(mod, ctl, cmd)
+    else :
+        print('no help message now')
 
 def read_yaml(filepath):
     fp = open(filepath, mode="r", encoding="utf-8")
@@ -150,7 +170,7 @@ def get_class_object(mod_obj, class_name) :
     return class_obj
     
 def get_class_method(instance, command) :
-    method = getattr(instance, command)
+    method = getattr(instance, command, None)
     return method
     
 def create_instance(class_obj, client):
@@ -313,18 +333,12 @@ def main() :
         logger.info("no command name for module '{0}', controller '{1}'".format(module, controller))
         usage_controller(module, controller, api_modules)
         sys.exit(1)
-
-    if len(args) < 3:
-        logger.info('len(args) is less than 3')
-        usage()
-        sys.exit(1)
-
+    
     command    = args[2]
-    
-    
+
     if show_help :
-        usage()
-        sys.exit(0)
+        usage_command(module, controller, command, api_modules)
+        sys.exit(1)
 
     load_dotenv()
 
