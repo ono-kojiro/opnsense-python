@@ -43,7 +43,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import logging
 logger = logging.getLogger(__name__)
 
+from opnsense.utils.optparser import *
+
 from pprint import pprint
+
+no_argument       = 0
+required_argument = 1
+optional_argument = 2
 
 load_dotenv(dotenv_path="./config.conf")
 load_dotenv(dotenv_path=".env")
@@ -214,14 +220,6 @@ def create_instance(class_obj, client):
     instance = class_obj(client)
     return instance
 
-def parse_args(args):
-    data = {}
-    for arg in args:
-        if "=" in arg:
-            key, value = arg.split("=", 1)
-            data[key] = value
-    return data
-
 def main() :
     ret = 0
     
@@ -236,103 +234,31 @@ def main() :
     args = []
     payload = {}
     params = {}
-   
+  
+    long_options = [
+        [ "help",   no_argument,       0, "h" ],
+        [ "output", required_argument, 0, "o" ],
+        [ "config", required_argument, 0, "c" ],
+        [ "verify-ssl", required_argument, 0, None ],
+        [ "loglevel",   required_argument, 0, "l" ],
+        [ None, 0, 0, None ],
+    ]
+
     api_modules = find_api_modules(pathlib.Path(__file__).parent)
     logger.info(api_modules)
 
     available_controllers = find_controllers(api_modules)
-    
+   
+    opts = {}
+    params = {}
+    non_opts = []
+
     i = 1
     while i < len(sys.argv) :
-        arg = sys.argv[i]
-        
-        # --help
-        m = re.search(r'^(--help|-h)', arg)
-        if m :
-          if m.group(1) == '--help' :
-              show_longhelp = True 
-          else :
-              show_help = True
-
-          i += 1
-          continue
-        
-        # --config, -c
-        m = re.search(r'^(--config|-c)=([^ ]+)', arg)
-        if m :
-          configfile = m.group(2)
-          continue
-
-        # --output, -o
-        m = re.search(r'^(--output|-o)(=([^ ]+))?', arg)
-        if m :
-          if m.group(3) :
-            output = m.group(3)
-          else :
-            i += 1
-            arg = sys.argv[i]
-            output = arg
-
-          i += 1
-          continue
-        
-        # --verify-ssl
-        m = re.search(r'^(--verify-ssl)(=([^ ]+))?', arg)
-        if m :
-          if m.group(3) :
-            verify_ssl = m.group(3)
-          else :
-            i += 1
-            arg = sys.argv[i]
-            verify_ssl = arg
-          
-          i += 1
-          continue
-        
-        # --uuid
-        m = re.search(r'^(--uuid)(=([^ ]+))', arg)
-        if m :
-          key = 'uuid'
-          value = m.group(3)
-          params[key] = value
-          i += 1
-          continue
-        
-        # --loglevel, -l
-        m = re.search(r'^(--loglevel|-l)(=([^ ]+))?', arg)
-        if m :
-          if m.group(3) :
-            loglevel = m.group(3)
-          else :
-            i += 1
-            arg = sys.argv[i]
-            loglevel = arg
-          
-          i += 1
-          continue
-        
-        # any param
-        m = re.search(r'^(--([^=]+))(=([^ ]+))', arg)
-        if m :
-          key   = m.group(2) 
-          value = m.group(4)
-          params[key] = value
-          i += 1
-          continue
-
-        # key=value
-        m = re.search(r'^([^-][^=]+)=([^ ]+)', arg)
-        if m :
-          key = m.group(1)
-          value = m.group(2)
-          payload[key] = value
-          i += 1
-          continue
-
-        # module or controller or command 
-        args.append(arg)
-        i += 1
-    
+        i = parse_option(i, sys.argv, long_options, opts, params, non_opts)
+        i = i + 1
+   
+    payload = params
     logger.debug('payload is {0}'.format(payload))
     
     if ret != 0:
@@ -359,31 +285,8 @@ def main() :
     fmt = '%(levelname)s:%(name)s: %(message)s'
     
     logging.basicConfig(level=level, format=fmt)
-    
-    if len(args) == 0:
-        logger.error('no module name')
-        usage(available_controllers)
-        sys.exit(1)
-    
-    module     = args[0]
-    if len(args) == 1:
-        logger.error("no controller name for module '{0}'".format(module))
-        controllers = available_controllers[module]
-        usage_module(module, controllers)
-        sys.exit(1)
-    
-    controller = args[1]
-    if len(args) == 2:
-        logger.error("no command name for module '{0}', controller '{1}'".format(module, controller))
-        usage_controller(module, controller, api_modules)
-        sys.exit(1)
-    
-    command    = args[2]
-    
-    if show_longhelp or show_help:
-        usage_command(module, controller, command, api_modules)
-        sys.exit(1)
-    
+   
+    configfile = opts['config']
     if configfile :
         dotenv_path = configfile
     else :
@@ -392,6 +295,31 @@ def main() :
     logger.debug('read dotenv file, {0}'.format(dotenv_path))
     load_dotenv(dotenv_path=dotenv_path)
 
+    
+    if len(non_opts) == 0:
+        logger.error('no module name')
+        usage(available_controllers)
+        sys.exit(1)
+    
+    module     = non_opts[0]
+    if len(args) == 1:
+        logger.error("no controller name for module '{0}'".format(module))
+        controllers = available_controllers[module]
+        usage_module(module, controllers)
+        sys.exit(1)
+    
+    controller = non_opts[1]
+    if len(non_opts) == 2:
+        logger.error("no command name for module '{0}', controller '{1}'".format(module, controller))
+        usage_controller(module, controller, api_modules)
+        sys.exit(1)
+    
+    command    = non_opts[2]
+
+    if 'help' in opts:
+        usage_command(module, controller, command, api_modules)
+        sys.exit(1)
+    
     key = os.getenv("OPNSENSE_KEY")
     secret = os.getenv("OPNSENSE_SECRET")
     base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
