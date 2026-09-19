@@ -169,6 +169,22 @@ def find_api_modules(base_dir: str):
 
     return modules
 
+
+def find_controllers(api_modules):
+    items = {}
+
+    for module_path in api_modules :
+        module_path = module_path.replace('.py', '')
+        module_name, controller_name = module_path.split('/')
+        if controller_name == '__init__' :
+            continue
+
+        if not module_name in items:
+            items[module_name] = {}
+        items[module_name][controller_name] = 1
+
+    return items
+
 def get_module_object(filepath):
     path = filepath
     path = re.sub(r'\.py$', '', path)
@@ -206,6 +222,7 @@ def main() :
     verify_ssl = False
     loglevel = 'info'
     show_help = False
+    configfile = None
 
     args = []
     payload = {}
@@ -213,20 +230,9 @@ def main() :
    
     api_modules = find_api_modules(pathlib.Path(__file__).parent)
     logger.info(api_modules)
-    for module_path in api_modules :
-        #print('MODULE_PATH: {0}'.format(module_path))
-        module_path = module_path.replace('.py', '')
-        module_name, controller_name = module_path.split('/')
-        if controller_name == '__init__' :
-            continue
 
-        if not module_name in available_controllers :
-            available_controllers[module_name] = {}
-        available_controllers[module_name][controller_name] = 1
-        #print(module_name, controller_name)
+    available_controllers = find_controllers(api_modules)
     
-    #print(api_modules)
-
     i = 1
     while i < len(sys.argv) :
         arg = sys.argv[i]
@@ -236,6 +242,12 @@ def main() :
         if m :
           show_help = True
           i += 1
+          continue
+        
+        # --config, -c
+        m = re.search(r'^(--config|-c)=([^ ]+)', arg)
+        if m :
+          configfile = m.group(2)
           continue
 
         # --output, -o
@@ -408,8 +420,15 @@ def main() :
 
     # get method
     method = get_class_method(instance, command)
+    if not method :
+        msg = "controller '{0}' DOES NOT have such command, '{1}'".format(controller, command)
+        logger.error(msg)
+        usage_controller(module, controller, api_modules)
+        sys.exit(1)
+
     res = method(data, params)
-    print(json.dumps(res, indent=4))
+    if res :
+        print(json.dumps(res, indent=4))
 
 if __name__ == "__main__":
     main()
