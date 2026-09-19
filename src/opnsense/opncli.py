@@ -66,6 +66,15 @@ def usage_simple(available_controllers):
         print('{0} '.format(module_name), end='')
     print('')
 
+    msg = '''
+The module details are displayed when you add the help option to the module.
+
+  ex.
+    $ opncli core --help
+'''
+
+    print(msg)
+
 def usage(available_controllers):
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
@@ -90,6 +99,15 @@ def usage_module(module_name, controllers):
     for controller in controllers :
         print('{0} '.format(controller), end='')
     print('')
+    
+    msg = '''
+The controller details are displayed when you add the help option to the controller.
+
+  ex.
+    $ opncli core system --help
+'''
+
+    print(msg)
 
 def usage_controller(module_name, controller_name, api_modules):
     prog = os.path.basename(sys.argv[0])
@@ -225,8 +243,8 @@ def main() :
     
     output = None
     verify_ssl = False
-    #loglevel = 'info'
-    loglevel = 'debug'
+    loglevel = 'info'
+    #loglevel = 'debug'
     show_help = False
     show_longhelp = False
     configfile = None
@@ -288,8 +306,10 @@ def main() :
     fmt = '%(levelname)s:%(name)s: %(message)s'
     
     logging.basicConfig(level=level, format=fmt)
-   
-    configfile = opts['config']
+  
+    if 'config' in opts :
+        configfile = opts['config']
+
     if configfile :
         dotenv_path = configfile
     else :
@@ -307,25 +327,27 @@ def main() :
         fp = sys.stdout
     
     if len(non_opts) == 0:
-        logger.error('no module name')
-        usage(available_controllers)
+        #logger.error('no module name')
+        usage_simple(available_controllers)
         sys.exit(1)
-    
-    module     = non_opts[0]
-    if len(args) == 1:
+    else :
+        module = non_opts[0]
+
+    if len(non_opts) <= 1:
         logger.error("no controller name for module '{0}'".format(module))
         controllers = available_controllers[module]
         usage_module(module, controllers)
         sys.exit(1)
+    else :
+        controller = non_opts[1]
     
-    controller = non_opts[1]
-    if len(non_opts) == 2:
+    if len(non_opts) <= 2:
         logger.error("no command name for module '{0}', controller '{1}'".format(module, controller))
         usage_controller(module, controller, api_modules)
         sys.exit(1)
+    else :
+        command = non_opts[2]
     
-    command    = non_opts[2]
-
     if 'help' in opts:
         usage_command(module, controller, command, api_modules)
         sys.exit(1)
