@@ -14,6 +14,8 @@ import ast
 import pathlib
 import importlib
 
+import inspect
+
 from dotenv import load_dotenv
 
 import opnsense
@@ -46,9 +48,55 @@ from pprint import pprint
 load_dotenv(dotenv_path="./config.conf")
 load_dotenv(dotenv_path=".env")
 
+api_modules = {}
+available_controllers = {}
+
 def usage():
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
+    print('  Available Module, Controller:')
+    for module_name in available_controllers :
+        print('    Module: {0}'.format(module_name))
+        print('      Controllers: ', end='')
+        for controller_name in available_controllers[module_name]:
+            print('{0}, '.format(controller_name), end='')
+        print('')
+        print('')
+
+def usage_module(module_name, controllers):
+    prog = os.path.basename(sys.argv[0])
+    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
+    print('')
+
+    print('  Available Controller for {0}:'.format(module_name))
+    print('    ', end='')
+    for controller in controllers :
+        print('{0} '.format(controller), end='')
+    print('')
+
+def usage_controller(module_name, controller_name, api_modules):
+    prog = os.path.basename(sys.argv[0])
+    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
+    print('')
+  
+    modulepath = module_name + '/' + controller_name + '.py'
+    mod_obj = get_module_object(modulepath)
+   
+    api_class_name = api_modules[modulepath]
+    # get class object
+    class_obj = get_class_object(mod_obj, api_class_name)
+    logger.debug(class_obj)
+
+    # create instance
+    instance = create_instance(class_obj, None)
+
+    print('  Available Command for {0}/{1}:'.format(module_name, controller_name))
+    print('    ', end='')
+    for name, func in inspect.getmembers(instance, inspect.ismethod) :
+        if name == '__init__' :
+            continue
+        print('{0} '.format(name), end='')
+    print('')
 
 def read_yaml(filepath):
     fp = open(filepath, mode="r", encoding="utf-8")
@@ -82,7 +130,8 @@ def find_api_modules(base_dir: str):
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 if re.search(r'API$', node.name) :
-                    modules[str(rel)] = node.name
+                    rel_path = str(rel)
+                    modules[rel_path] = node.name
 
     return modules
 
@@ -127,6 +176,22 @@ def main() :
     args = []
     payload = {}
     params = {}
+   
+    api_modules = find_api_modules(pathlib.Path(__file__).parent)
+    logger.info(api_modules)
+    for module_path in api_modules :
+        #print('MODULE_PATH: {0}'.format(module_path))
+        module_path = module_path.replace('.py', '')
+        module_name, controller_name = module_path.split('/')
+        if controller_name == '__init__' :
+            continue
+
+        if not module_name in available_controllers :
+            available_controllers[module_name] = {}
+        available_controllers[module_name][controller_name] = 1
+        #print(module_name, controller_name)
+    
+    #print(api_modules)
 
     i = 1
     while i < len(sys.argv) :
@@ -232,25 +297,34 @@ def main() :
     logging.basicConfig(level=level)
     
     if len(args) == 0:
-        logger.info('len(args) is zero')
+        logger.error('no module name')
         usage()
+        sys.exit(1)
+    
+    module     = args[0]
+    if len(args) == 1:
+        logger.error("no controller name for module '{0}'".format(module))
+        controllers = available_controllers[module]
+        usage_module(module, controllers)
+        sys.exit(1)
+    
+    controller = args[1]
+    if len(args) == 2:
+        logger.info("no command name for module '{0}', controller '{1}'".format(module, controller))
+        usage_controller(module, controller, api_modules)
         sys.exit(1)
 
     if len(args) < 3:
-        logger.info('len(args) is over 3')
+        logger.info('len(args) is less than 3')
         usage()
         sys.exit(1)
 
-    module     = args[0]
-    controller = args[1]
     command    = args[2]
     
     
     if show_help :
         usage()
         sys.exit(0)
-
-
 
     load_dotenv()
 
@@ -283,8 +357,6 @@ def main() :
     logger.info('Payload: {0}'.format(data))
     logger.info('OPNsenseClient')
 
-    api_modules = find_api_modules(pathlib.Path(__file__).parent)
-    logger.debug(api_modules)
     modulepath = module + '/' + controller + '.py'
 
     if not modulepath in api_modules:
@@ -292,6 +364,7 @@ def main() :
         sys.exit(1)
 
     logger.debug('found {0} in api_modules'.format(modulepath))
+    print('check {0} in api_modules... '.format(modulepath))
     api_class_name = api_modules[modulepath]
     logger.debug('api_class_name is {0}'.format(api_class_name))
 

@@ -12,7 +12,7 @@ class CoreSystemAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def status(self, data=None):
+    def status(self, data=None, params=None):
         """
         Get system status
         GET /api/core/system/status
