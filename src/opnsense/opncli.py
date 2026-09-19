@@ -186,6 +186,15 @@ def main() :
           
           i += 1
           continue
+        
+        # any param
+        m = re.search(r'^(--([^=]+))(=([^ ]+))', arg)
+        if m :
+          key   = m.group(2) 
+          value = m.group(4)
+          params[key] = value
+          i += 1
+          continue
 
         # key=value
         m = re.search(r'^([^-][^=]+)=([^ ]+)', arg)

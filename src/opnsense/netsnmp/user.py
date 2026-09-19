@@ -30,6 +30,10 @@ class NetSnmpUserAPI:
         """
         POST /api/netsnmp/user/del_user
         """
+        if not 'uuid' in params :
+            logger.error("param 'uuid' is not defined")
+            sys.exit(2)
+
         param = params['uuid']
         url = "/api/netsnmp/user/del_user/{0}".format(param)
         return self.client.post(url)
