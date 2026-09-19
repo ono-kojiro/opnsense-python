@@ -151,15 +151,16 @@ def usage_command(mod, ctl, cmd, api_modules):
     
     logger.debug(instance)
     
-    
     # get help method
     method_name = '_' + api_class_name + '__' + cmd
     logger.debug("check method name '{0}' ...".format(method_name))
     method = get_class_method(instance, method_name)
     if method :
+        logger.debug('method is {0}'.format(method))
+        logger.debug('call help message')
         res = method(mod, ctl, cmd)
     else :
-        print('no help message now')
+        logger.info('no help message now')
 
 def read_yaml(filepath):
     fp = open(filepath, mode="r", encoding="utf-8")
@@ -269,14 +270,15 @@ def main() :
    
     opts = {}
     params = {}
+    data = {}
     non_opts = []
 
     i = 1
     while i < len(sys.argv) :
-        i = parse_option(i, sys.argv, long_options, opts, params, non_opts)
+        i = parse_option(i, sys.argv, long_options, opts, params, data, non_opts)
         i = i + 1
    
-    payload = params
+    payload = data
     logger.debug('payload is {0}'.format(payload))
     
     if ret != 0:

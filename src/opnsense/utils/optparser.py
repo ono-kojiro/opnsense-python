@@ -29,7 +29,7 @@ def init_options(long_options):
 
     return opts
 
-def parse_option(i, args, long_options, opts, params, non_opts):
+def parse_option(i, args, long_options, opts, params, data, non_opts):
     arg = args[i]
 
     name  = None
@@ -66,7 +66,7 @@ def parse_option(i, args, long_options, opts, params, non_opts):
             msg = "arg '{0}' not mached to {1} and {2}".format(arg, long_opt, short_opt)
             logger.debug(msg)
 
-    if not name :
+    while not name :
         m = re.search(r'^(--([^=]+))(=([^ ]+))?', arg)
         if m :
             name  = m.group(2)
@@ -74,10 +74,19 @@ def parse_option(i, args, long_options, opts, params, non_opts):
             msg = "use as parameter, {0}, {1}".format(name, value)
             logger.debug(msg)
             params[name] = value
-        else :
-            msg = "use as non-optional argument, {0}".format(arg)
-            logger.debug(msg)
-            non_opts.append(arg)
+            break
+
+        m = re.search(r'^([^=]+)=([^ ]+)', arg)
+        if m :
+            name  = m.group(1)
+            value = m.group(2)
+            data[name] = value
+            break
+            
+        msg = "use as non-optional argument, {0}".format(arg)
+        logger.debug(msg)
+        non_opts.append(arg)
+        break
 
     return i
 
