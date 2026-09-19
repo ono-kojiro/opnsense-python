@@ -51,7 +51,7 @@ load_dotenv(dotenv_path=".env")
 api_modules = {}
 available_controllers = {}
 
-def usage_simple():
+def usage_simple(available_controllers):
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
     print('  Available Modules:')
@@ -60,7 +60,7 @@ def usage_simple():
         print('{0} '.format(module_name), end='')
     print('')
 
-def usage():
+def usage(available_controllers):
     prog = os.path.basename(sys.argv[0])
     print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
     print('  Available Module, Controller:')
@@ -125,8 +125,13 @@ def usage_command(mod, ctl, cmd, api_modules):
     # create instance
     instance = create_instance(class_obj, None)
     
+    logger.debug(instance)
+    
+    
     # get help method
-    method = get_class_method(instance, '__' + cmd)
+    method_name = '_' + api_class_name + '__' + cmd
+    logger.debug("check method name '{0}' ...".format(method_name))
+    method = get_class_method(instance, method_name)
     if method :
         res = method(mod, ctl, cmd)
     else :
@@ -200,6 +205,8 @@ def get_class_object(mod_obj, class_name) :
     return class_obj
     
 def get_class_method(instance, command) :
+    logger.debug(instance)
+    logger.debug("getattr for command {0}".format(command))
     method = getattr(instance, command, None)
     return method
     
@@ -220,8 +227,10 @@ def main() :
     
     output = None
     verify_ssl = False
-    loglevel = 'info'
+    #loglevel = 'info'
+    loglevel = 'debug'
     show_help = False
+    show_longhelp = False
     configfile = None
 
     args = []
@@ -237,10 +246,14 @@ def main() :
     while i < len(sys.argv) :
         arg = sys.argv[i]
         
-        # --help, -h
+        # --help
         m = re.search(r'^(--help|-h)', arg)
         if m :
-          show_help = True
+          if m.group(1) == '--help' :
+              show_longhelp = True 
+          else :
+              show_help = True
+
           i += 1
           continue
         
@@ -339,12 +352,17 @@ def main() :
     else :
         print('ERROR: unknown loglevel, {0}'.format(loglevel), file=sys.stderr)
         sys.exit(1)
-
-    logging.basicConfig(level=level)
+    
+    # DEFAULT  level:name:message
+    #format = '%(levelname)s:%(name)s:%(message)s'
+    # CUSTOM (add space)
+    fmt = '%(levelname)s:%(name)s: %(message)s'
+    
+    logging.basicConfig(level=level, format=fmt)
     
     if len(args) == 0:
         logger.error('no module name')
-        usage()
+        usage(available_controllers)
         sys.exit(1)
     
     module     = args[0]
@@ -356,23 +374,29 @@ def main() :
     
     controller = args[1]
     if len(args) == 2:
-        logger.info("no command name for module '{0}', controller '{1}'".format(module, controller))
+        logger.error("no command name for module '{0}', controller '{1}'".format(module, controller))
         usage_controller(module, controller, api_modules)
         sys.exit(1)
     
     command    = args[2]
-
-    if show_help :
+    
+    if show_longhelp or show_help:
         usage_command(module, controller, command, api_modules)
         sys.exit(1)
-
-    load_dotenv()
+    
+    if configfile :
+        dotenv_path = configfile
+    else :
+        dotenv_path = './.env'
+    
+    logger.debug('read dotenv file, {0}'.format(dotenv_path))
+    load_dotenv(dotenv_path=dotenv_path)
 
     key = os.getenv("OPNSENSE_KEY")
     secret = os.getenv("OPNSENSE_SECRET")
     base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
     
-    logger.info('OPNsenseClient')
+    logger.debug('OPNsenseClient')
 
     client = OPNsenseClient(
         base_url=base_url,
@@ -394,8 +418,7 @@ def main() :
           controller : payload
         }
     
-    logger.info('Payload: {0}'.format(data))
-    logger.info('OPNsenseClient')
+    logger.debug('Payload: {0}'.format(data))
 
     modulepath = module + '/' + controller + '.py'
 
