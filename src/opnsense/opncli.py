@@ -51,9 +51,6 @@ no_argument       = 0
 required_argument = 1
 optional_argument = 2
 
-load_dotenv(dotenv_path="./config.conf")
-load_dotenv(dotenv_path=".env")
-
 api_modules = {}
 available_controllers = {}
 
@@ -277,7 +274,7 @@ def main() :
     while i < len(sys.argv) :
         i = parse_option(i, sys.argv, long_options, opts, params, data, non_opts)
         i = i + 1
-   
+
     payload = data
     logger.debug('payload is {0}'.format(payload))
     
@@ -311,14 +308,26 @@ def main() :
   
     if 'config' in opts :
         configfile = opts['config']
-
-    if configfile :
-        dotenv_path = configfile
     else :
-        dotenv_path = './.env'
-    
-    logger.debug('read dotenv file, {0}'.format(dotenv_path))
-    load_dotenv(dotenv_path=dotenv_path)
+        home = os.getenv("HOME")
+        config_list = []
+        config_list.append(       './config.conf')
+        config_list.append(       './.env')
+        config_list.append(home + '/.opnsense/config.conf')
+
+        for filepath in config_list:
+            logger.debug('search config candidate, {0}'.format(filepath))
+            if os.path.exists(filepath) :
+                configfile = filepath
+                logger.debug('FOUND config candidate, {0}'.format(filepath))
+                break
+            else :
+                logger.debug('NOT found config candidate, {0}'.format(filepath))
+
+   
+    if configfile :
+        logger.debug('read config file as dotenv, {0}'.format(configfile))
+        load_dotenv(dotenv_path=configfile)
 
     if 'output' in opts:
         output = opts['output']
