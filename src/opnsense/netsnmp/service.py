@@ -19,34 +19,35 @@ class NetSnmpServiceAPI:
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
+        self.base   = "/api/netsnmp/service"
 
-    def reconfigure(self, json=None):
+    def reconfigure(self, data=None, params=None):
         """
         POST /api/netsnmp/service/reconfigure
         """
-        return self.client.post("/api/netsnmp/service/reconfigure")
+        return self.client.post("{0}/reconfigure".format(self.base))
     
-    def restart(self, json=None):
+    def restart(self, data=None, params=None):
         """
         POST /api/netsnmp/service/restart
         """
-        return self.client.post("/api/netsnmp/service/restart")
+        return self.client.post("{0}/restart".format(self.base))
 
-    def start(self, json=None):
+    def start(self, data=None, params=None):
         """
         POST /api/netsnmp/service/start
         """
-        return self.client.post("/api/netsnmp/service/start")
+        return self.client.post("{0}/start".format(self.base))
     
-    def status(self, json=None):
+    def status(self, data=None, params=None):
         """
         GET /api/netsnmp/service/status
         """
-        return self.client.get("/api/netsnmp/service/status")
+        return self.client.get("{0}/status".format(self.base))
     
-    def stop(self, json=None):
+    def stop(self, data=None, params=None):
         """
         POST /api/netsnmp/service/stop
         """
-        return self.client.post("/api/netsnmp/service/stop")
+        return self.client.post("{0}/stop".format(self.base))
 

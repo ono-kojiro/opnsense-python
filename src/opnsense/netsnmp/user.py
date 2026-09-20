@@ -43,6 +43,9 @@ class NetSnmpUserAPI:
             print('ERROR: no enabled data')
             ret += 1
 
+        if ret :
+            sys.exit(1)
+
         return self.client.post("/api/netsnmp/user/add_user", json=data)
     
     def del_user(self, data=None, params=None):

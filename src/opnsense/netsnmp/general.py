@@ -20,17 +20,25 @@ class NetSnmpGeneralAPI:
     def __init__(self, client: OPNsenseClient):
         self.client = client
 
-    def get(self, json=None):
+    def get(self, data=None, params=None):
         """
         Get snmp general information.
         GET /api/netsnmp/general/get
         """
         return self.client.get("/api/netsnmp/general/get")
-    
-    def set(self, json=None):
+
+    def __set(self, mod, ctl, cmd) :
+        msg = '''
+ex.
+  $ opncli netsnmp general set enabled=1
+  $ opncli netsnmp service reconfigure
+'''
+        print(msg)
+
+    def set(self, data=None, params=None):
         """
         Set snmp general information.
         POST /api/netsnmp/general/set
         """
-        return self.client.set("/api/netsnmp/general/set", json=json)
+        return self.client.set("/api/netsnmp/general/set", json=data)
 
