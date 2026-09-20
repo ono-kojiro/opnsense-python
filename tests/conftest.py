@@ -7,6 +7,9 @@ from opnsense.client import OPNsenseClient
 
 from opnsense.auth.group import AuthGroupAPI
 
+from opnsense.captiveportal.access  import CaptiveportalAccessAPI
+from opnsense.captiveportal.service import CaptiveportalServiceAPI
+
 from opnsense.core.system import CoreSystemAPI
 from opnsense.core.menu   import CoreMenuAPI
 
@@ -46,6 +49,17 @@ def opnsense_client(opnsense_credentials):
 @pytest.fixture
 def auth_group_api(opnsense_client):
     return AuthGroupAPI(opnsense_client)
+
+#
+# Module: Captiveportal
+#
+@pytest.fixture
+def captiveportal_access_api(opnsense_client):
+    return CaptiveportalAccessAPI(opnsense_client)
+
+@pytest.fixture
+def captiveportal_service_api(opnsense_client):
+    return CaptiveportalServiceAPI(opnsense_client)
 
 #
 # Module: Core
