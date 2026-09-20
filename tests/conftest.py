@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 from opnsense.client import OPNsenseClient
 
+from opnsense.auth.group import AuthGroupAPI
+
 from opnsense.core.system import CoreSystemAPI
 from opnsense.core.menu   import CoreMenuAPI
 
@@ -38,6 +40,16 @@ def opnsense_client(opnsense_credentials):
         verify_ssl=False,
     )
 
+#
+# Module: Auth
+# 
+@pytest.fixture
+def auth_group_api(opnsense_client):
+    return AuthGroupAPI(opnsense_client)
+
+#
+# Module: Core
+#
 @pytest.fixture
 def core_system_api(opnsense_client):
     return CoreSystemAPI(opnsense_client)
@@ -46,10 +58,16 @@ def core_system_api(opnsense_client):
 def core_menu_api(opnsense_client):
     return CoreMenuAPI(opnsense_client)
 
+#
+# Module: Firewall
+#
 @pytest.fixture
 def firewall_api(opnsense_client):
     return FirewallAPI(opnsense_client)
 
+#
+# Module: Interfaces
+#
 @pytest.fixture
 def interfaces_api(opnsense_client):
     return InterfacesAPI(opnsense_client)
