@@ -36,10 +36,16 @@ class NetSnmpUserAPI:
         POST /api/netsnmp/user/add_user
         """
         ret = 0
-        if not 'username' in data :
+        if not 'username' in data['user'] :
             print('ERROR: no username data')
             ret += 1
-        if not 'enabled' in data :
+        if not 'password' in data['user'] :
+            print('ERROR: no password data')
+            ret += 1
+        if not 'enckey' in data['user'] :
+            print('ERROR: no enckey data')
+            ret += 1
+        if not 'enabled' in data['user'] :
             print('ERROR: no enabled data')
             ret += 1
 
