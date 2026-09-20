@@ -22,11 +22,11 @@ import opnsense
 
 PACKAGE_ROOT = pathlib.Path(opnsense.__file__).parent
 
-from opnsense.interfaces import InterfacesAPI
+#from opnsense.interfaces import InterfacesAPI
 
 from opnsense.client import OPNsenseClient
 from opnsense.firewall import FirewallAPI
-from opnsense.interfaces import InterfacesAPI
+#from opnsense.interfaces import InterfacesAPI
 from opnsense.interfaces.vip_settings import VipSettingsAPI
 from opnsense.firewall.category import CategoryAPI
 

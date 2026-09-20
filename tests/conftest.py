@@ -14,7 +14,8 @@ from opnsense.core.system import CoreSystemAPI
 from opnsense.core.menu   import CoreMenuAPI
 
 from opnsense.firewall import FirewallAPI
-from opnsense.interfaces import InterfacesAPI
+
+from opnsense.interfaces.settings import InterfacesSettingsAPI
 
 # プロジェクトルートの .env を読み込む
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -83,6 +84,6 @@ def firewall_api(opnsense_client):
 # Module: Interfaces
 #
 @pytest.fixture
-def interfaces_api(opnsense_client):
-    return InterfacesAPI(opnsense_client)
+def interfaces_settings_api(opnsense_client):
+    return InterfacesSettingsAPI(opnsense_client)
 

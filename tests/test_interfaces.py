@@ -1,8 +1,8 @@
 from opnsense.client import OPNsenseClient
-from opnsense.interfaces import InterfacesAPI
 
-from pprint import pprint
+def test_interfaces_settings_get(interfaces_settings_api):
+    api = interfaces_settings_api
+    res = api.get()
 
-def test_interfaces_vxlan_settings(interfaces_api):
-    assert 0 == 0
+    assert res['settings']['dhcp6_debug'] == "0"
 
