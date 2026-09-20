@@ -1,14 +1,18 @@
 import os
 import pytest
+
 from dotenv import load_dotenv
+
 from opnsense.client import OPNsenseClient
+
+from opnsense.core.system import CoreSystemAPI
+from opnsense.core.menu   import CoreMenuAPI
+
 from opnsense.firewall import FirewallAPI
 from opnsense.interfaces import InterfacesAPI
 
-
 # プロジェクトルートの .env を読み込む
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
-
 
 @pytest.fixture(scope="session")
 def opnsense_credentials():
@@ -31,8 +35,16 @@ def opnsense_client(opnsense_credentials):
         base_url=opnsense_credentials["base_url"],
         key=opnsense_credentials["key"],
         secret=opnsense_credentials["secret"],
-        verify_ssl=True,
+        verify_ssl=False,
     )
+
+@pytest.fixture
+def core_system_api(opnsense_client):
+    return CoreSystemAPI(opnsense_client)
+
+@pytest.fixture
+def core_menu_api(opnsense_client):
+    return CoreMenuAPI(opnsense_client)
 
 @pytest.fixture
 def firewall_api(opnsense_client):

@@ -1,6 +1,5 @@
 from opnsense.client import OPNsenseClient
 
-
 class CoreMenuAPI:
     """
     OPNsense Core Menu API
