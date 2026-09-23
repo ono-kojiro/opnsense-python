@@ -75,6 +75,12 @@ $ opncli netsnmp user add_user \
 $ opncli netsnmp service reconfigure
 ```
 
+### enable snmp service
+
+```
+$ opncli netsnmp general set enabled=1
+```
+
 ### netsnmp::user::del_user
 
 ```

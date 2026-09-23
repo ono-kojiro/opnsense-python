@@ -358,7 +358,14 @@ def main() :
         sys.exit(1)
     else :
         command = non_opts[2]
-    
+   
+    command_aliases = {
+        'import' : 'load',
+        'export' : 'save',
+    }
+
+    command = command_aliases.get(command, command)
+
     if 'help' in opts:
         usage_command(module, controller, command, api_modules)
         sys.exit(1)
