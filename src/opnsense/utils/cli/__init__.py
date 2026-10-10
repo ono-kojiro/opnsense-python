@@ -6,4 +6,5 @@ import ast
 import pathlib
 
 from .usage import *
+from .apikey import read_apikey
 

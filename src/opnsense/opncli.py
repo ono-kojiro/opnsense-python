@@ -68,7 +68,7 @@ def main() :
     #loglevel = 'debug'
     show_help = False
     show_longhelp = False
-    configfile = None
+    apikey_conf = None
 
     args = []
     payload = {}
@@ -77,7 +77,7 @@ def main() :
     long_options = [
         [ "help",   no_argument,       0, "h" ],
         [ "output", required_argument, 0, "o" ],
-        [ "config", required_argument, 0, "c" ],
+        [ "apikey", required_argument, 0, "a" ],
         [ "verify-ssl", required_argument, 0, None ],
         [ "loglevel",   required_argument, 0, "l" ],
         [ None, 0, 0, None ],
@@ -131,29 +131,11 @@ def main() :
     fmt = '%(message)s'
     
     logging.basicConfig(level=level, format=fmt)
-  
-    if 'config' in opts :
-        configfile = opts['config']
-    else :
-        home = os.getenv("HOME")
-        config_list = []
-        config_list.append(       './config.conf')
-        config_list.append(       './.env')
-        config_list.append(home + '/.opnsense/config.conf')
+        
+    if 'apikey' in opts :
+        apikey_conf = opts['apikey']
+    read_apikey(apikey_conf)
 
-        for filepath in config_list:
-            logger.debug('search config candidate, {0}'.format(filepath))
-            if os.path.exists(filepath) :
-                configfile = filepath
-                logger.debug('FOUND config candidate, {0}'.format(filepath))
-                break
-            else :
-                logger.debug('NOT found config candidate, {0}'.format(filepath))
-
-   
-    if configfile :
-        logger.debug('read config file as dotenv, {0}'.format(configfile))
-        load_dotenv(dotenv_path=configfile)
 
     if 'output' in opts:
         output = opts['output']
