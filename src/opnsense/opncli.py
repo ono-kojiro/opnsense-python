@@ -122,7 +122,8 @@ def main() :
     # DEFAULT  level:name:message
     #format = '%(levelname)s:%(name)s:%(message)s'
     # CUSTOM (add space)
-    fmt = '%(levelname)s:%(name)s: %(message)s'
+    #fmt = '%(levelname)s:%(name)s: %(message)s'
+    fmt = '%(message)s'
     
     logging.basicConfig(level=level, format=fmt)
   

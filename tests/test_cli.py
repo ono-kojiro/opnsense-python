@@ -5,11 +5,7 @@ import shlex
 
 import re
 
-def test_cli():
-    cmd = 'opncli'
-    args = shlex.split(cmd)
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-
+def check_message(proc, msg):
     ret = 1
     while True:
         line = proc.stdout.readline().rstrip()
@@ -17,10 +13,32 @@ def test_cli():
             break
         print(line)
 
-        exp = 'Available Modules:'
+        exp = msg
         m = re.search(exp, str(line))
         if m :
             ret = 0
             break
+    return ret
 
-    assert ret == 0
+def test_cli():
+    cmd = 'opncli'
+    args = shlex.split(cmd)
+    proc = subprocess.Popen(args,
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             text=True,
+           )
+
+    msg = 'Available Modules:'
+    ret = check_message(proc, msg)
+    assert ret == 1
+
+def test_cli_core():
+    cmd = 'opncli core --help'
+    args = shlex.split(cmd)
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+
+    msg = 'Available Controller for core'
+    ret = check_message(proc, msg)
+    assert ret == 1
+
