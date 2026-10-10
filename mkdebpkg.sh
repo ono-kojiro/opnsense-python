@@ -1,8 +1,8 @@
 #!/bin/sh
 
-PKGNAME=`tomlq -r '.tool.poetry.name' pyproject.toml`
-PKGVER=`tomlq -r '.tool.poetry.version' pyproject.toml`
-SCRIPT_ENTRY=`tomlq -r '.tool.poetry.scripts.opncli' pyproject.toml`
+PKGNAME=`tomlq -r '.project.name' pyproject.toml`
+PKGVER=`tomlq -r '.project.version' pyproject.toml`
+SCRIPT_ENTRY=`tomlq -r '.project.scripts.opncli' pyproject.toml`
 
 ARCH=all
 OUTPUTDIR=.
