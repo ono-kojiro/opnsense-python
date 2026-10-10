@@ -204,6 +204,12 @@ def usage_base(api_modules, mod2ctl) :
     print_available_modules(module_names)
     print_available_controllers(module_names, mod2ctl)
 
+    msg = '''
+  Environment Variables:
+    key:    OPNsense API Key
+    secret: OPNsense Secret
+'''
+    print(msg, file=sys.stderr)
 
 def usage_target(modpath2cls, mod2ctl):
     usage_base(modpath2cls, mod2ctl)

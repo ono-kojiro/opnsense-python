@@ -77,7 +77,6 @@ def main() :
     long_options = [
         [ "help",   no_argument,       0, "h" ],
         [ "output", required_argument, 0, "o" ],
-        [ "apikey", required_argument, 0, "a" ],
         [ "verify-ssl", required_argument, 0, None ],
         [ "loglevel",   required_argument, 0, "l" ],
         [ None, 0, 0, None ],
@@ -131,11 +130,6 @@ def main() :
     fmt = '%(message)s'
     
     logging.basicConfig(level=level, format=fmt)
-        
-    if 'apikey' in opts :
-        apikey_conf = opts['apikey']
-    read_apikey(apikey_conf)
-
 
     if 'output' in opts:
         output = opts['output']
@@ -193,9 +187,17 @@ def main() :
         usage_command(module, controller, command, path2cls)
         sys.exit(1)
     
-    key = os.getenv("key")
-    secret = os.getenv("secret")
-    #base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
+    key = os.getenv('key')
+    if not key :
+        print('ERROR: no environment variable, "key"')
+        ret = ret + 1
+    secret = os.getenv('secret')
+    if not secret :
+        print('ERROR: no environment variable, "secret"')
+        ret = ret + 1
+    if ret :
+        sys.exit(1)
+
     base_url = 'https://{0}'.format(target)
     
     logger.debug('OPNsenseClient')
