@@ -53,8 +53,11 @@ no_argument       = 0
 required_argument = 1
 optional_argument = 2
 
-api_modules = {}
-available_controllers = {}
+def list_get(lst, idx, default):
+    try:
+        return lst[idx]
+    except IndexError:
+        return default
 
 def main() :
     ret = 0
@@ -80,11 +83,13 @@ def main() :
         [ None, 0, 0, None ],
     ]
 
-    api_modules = find_api_modules(pathlib.Path(__file__).parent, PACKAGE_ROOT)
-    logger.info(api_modules)
+    mod2ctl = {}
 
-    available_controllers = find_controllers(api_modules)
-   
+    path2cls = find_api_modules(pathlib.Path(__file__).parent, PACKAGE_ROOT)
+    logger.info(path2cls)
+
+    mod2ctl = find_controllers(path2cls)
+
     opts = {}
     params = {}
     data = {}
@@ -157,28 +162,43 @@ def main() :
         fp = open(output, mode='w', encoding='utf-8')
     else :
         fp = sys.stdout
-    
-    if len(non_opts) == 0:
-        #logger.error('no module name')
-        usage_simple(available_controllers)
-        sys.exit(1)
-    else :
-        module = non_opts[0]
+  
+    target = None
+    module = None
+    controller = None
+    command = None
 
-    if len(non_opts) <= 1:
+    target     = list_get(non_opts, 0, None)
+    module     = list_get(non_opts, 1, None)
+    controller = list_get(non_opts, 2, None)
+    command    = list_get(non_opts, 3, None)
+
+    if target is None :
+        usage_target(path2cls, mod2ctl)
+        sys.exit(1)
+
+    if module is None :
+        #module = 'core'
+        usage_base(path2cls, mod2ctl)
+        sys.exit(1)
+
+    if not module in mod2ctl :
+        print('ERROR: no such module, {0}'.format(module))
+        usage_base(path2cls, mod2ctl)
+        sys.exit(1) 
+
+    if controller is None :
+        controller = 'system'
         logger.error("no controller name for module '{0}'".format(module))
-        controllers = available_controllers[module]
-        usage_module(module, controllers)
+        usage_module(module, mod2ctl[module])
         sys.exit(1)
-    else :
-        controller = non_opts[1]
     
-    if len(non_opts) <= 2:
-        logger.error("no command name for module '{0}', controller '{1}'".format(module, controller))
-        usage_controller(module, controller, api_modules)
+    if command is None :
+        #command = 'status'
+        msg = "no command name for module '{0}', controller '{1}'".format(module, controller)
+        logger.error(msg)
+        usage_controller(module, controller, path2cls)
         sys.exit(1)
-    else :
-        command = non_opts[2]
    
     command_aliases = {
         'import' : 'load',
@@ -188,12 +208,13 @@ def main() :
     command = command_aliases.get(command, command)
 
     if 'help' in opts:
-        usage_command(module, controller, command, api_modules)
+        usage_command(module, controller, command, path2cls)
         sys.exit(1)
     
-    key = os.getenv("OPNSENSE_KEY")
-    secret = os.getenv("OPNSENSE_SECRET")
-    base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
+    key = os.getenv("key")
+    secret = os.getenv("secret")
+    #base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
+    base_url = 'https://{0}'.format(target)
     
     logger.debug('OPNsenseClient')
 
@@ -221,13 +242,13 @@ def main() :
 
     modulepath = module + '/' + controller + '.py'
 
-    if not modulepath in api_modules:
-        logger.error('NOT found {0} in api_modules'.format(modulepath))
+    if not modulepath in path2cls:
+        logger.error('NOT found {0} in path2cls'.format(modulepath))
         sys.exit(1)
 
-    logger.debug('found {0} in api_modules'.format(modulepath))
-    logger.debug('check {0} in api_modules...'.format(modulepath))
-    api_class_name = api_modules[modulepath]
+    logger.debug('found {0} in path2cls'.format(modulepath))
+    logger.debug('check {0} in path2cls...'.format(modulepath))
+    api_class_name = path2cls[modulepath]
     logger.debug('api_class_name is {0}'.format(api_class_name))
 
     mod_obj = get_module_object(modulepath)
@@ -245,7 +266,7 @@ def main() :
     if not method :
         msg = "controller '{0}' DOES NOT have such command, '{1}'".format(controller, command)
         logger.error(msg)
-        usage_controller(module, controller, api_modules)
+        usage_controller(module, controller, path2cls)
         sys.exit(1)
 
     res = method(data, params)

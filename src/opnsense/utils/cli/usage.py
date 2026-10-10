@@ -10,8 +10,11 @@ import inspect
 import logging
 logger = logging.getLogger(__name__)
 
+from pprint import pprint
+
 __all__ = [
-  'usage',
+  'usage_target',
+  'usage_base',
   'usage_simple',
   'usage_module',
   'usage_controller',
@@ -63,6 +66,15 @@ def find_api_modules(base_dir: str, package_root):
 
     return modules
 
+def get_module_names(api_modules):
+    items = {}
+
+    for module_path in api_modules :
+        module_path = module_path.replace('.py', '')
+        module_name, controller_name = module_path.split('/')
+        items[module_name] = 1
+
+    return sorted(list(items))
 
 def find_controllers(api_modules):
     items = {}
@@ -82,6 +94,14 @@ def find_controllers(api_modules):
 def get_class_object(mod_obj, class_name) :
     class_obj = getattr(mod_obj, class_name)
     return class_obj
+
+def get_class_methods(instance) :
+    items = []
+    for name, func in inspect.getmembers(instance, inspect.ismethod) :
+        if re.search(r'^_', name) :
+            continue
+        items.append(name)
+    return items
     
 def get_class_method(instance, command) :
     logger.debug(instance)
@@ -130,25 +150,66 @@ The module details are displayed when you add the help option to the module.
     for line in lines:
         print('{0}'.format(line), file=sys.stderr)
 
+def print_available_modules(module_names):
+    lines = []
 
-def usage(available_controllers):
+    lines.append('  Available Modules:')
+    line = '    '
+    for name in module_names:
+        line += ' {0},'.format(name)
+    line = re.sub(r',$', '', line)
+    lines.append(line)
+    lines.append('')
+
+    for line in lines:
+        print('{0}'.format(line), file=sys.stderr)
+
+def print_available_controllers(module_names, mod2ctl):
+    lines = []
+
+    lines.append('  Available Controllers:')
+    for name in module_names:
+        line = '    {0}:'.format(name)
+        controllers = mod2ctl[name]
+        for cont in controllers:
+            line = line + ' {0},'.format(cont)
+        line = re.sub(r',$', '', line)
+        lines.append(line)
+    lines.append('')
+    
+    for line in lines:
+        print('{0}'.format(line), file=sys.stderr)
+
+def usage_base(api_modules, mod2ctl) :
+    module_names = get_module_names(api_modules)
+
     prog = os.path.basename(sys.argv[0])
-    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
-    print('  Available Module, Controller:')
-    for module_name in available_controllers :
-        print('    Module: {0}'.format(module_name))
-        print('      Controllers: ', end='')
-        for controller_name in available_controllers[module_name]:
-            print('{0}, '.format(controller_name), end='')
-        print('')
-        print('')
-    print('')
 
+    lines = []
+    line = 'usage: {0} '.format(prog)
+    line = line + 'TARGET MODULE CONTROLLER COMMAND [OPTIONS]'
+    lines.append(line)
+
+    msg = '''
+  TARGET:  IP address of target OPNsense
+  MODULE:  core, interfaces, firewall and so on...
+  CONTROLLERS: system(for core), settings(for interfaces) and so on...
+  COMMAND: get, set and so on (depend on MODULE)
+'''
+    lines.append(msg)
+    
+    for line in lines:
+        print('{0}'.format(line), file=sys.stderr)
+
+    print_available_modules(module_names)
+    print_available_controllers(module_names, mod2ctl)
+
+
+def usage_target(modpath2cls, mod2ctl):
+    usage_base(modpath2cls, mod2ctl)
+    sys.exit(1)
 
 def usage_module(module_name, controllers):
-    prog = os.path.basename(sys.argv[0])
-    print('usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog))
-    print('')
 
     print('  Available Controller for {0}:'.format(module_name), file=sys.stderr)
     print('    ', end='', file=sys.stderr)
@@ -166,14 +227,11 @@ The controller details are displayed when you add the help option to the control
     print(msg, file=sys.stderr)
 
 def usage_controller(module_name, controller_name, api_modules):
-    prog = os.path.basename(sys.argv[0])
     lines = []
-    line  = 'usage: {0} MODULE CONTROLLER COMMAND [OPTIONS]'.format(prog)
-    lines.append(line)
 
     modulepath = module_name + '/' + controller_name + '.py'
     mod_obj = get_module_object(modulepath)
-   
+  
     api_class_name = api_modules[modulepath]
     # get class object
     class_obj = get_class_object(mod_obj, api_class_name)
@@ -185,9 +243,10 @@ def usage_controller(module_name, controller_name, api_modules):
     line = '  Available Command for {0}/{1}:'.format(module_name, controller_name)
     lines.append(line)
     line = '    '
-    for name, func in inspect.getmembers(instance, inspect.ismethod) :
-        if re.search(r'^_', name) :
-            continue
+
+    methods = get_class_methods(instance)
+
+    for name in methods :
         line = line + '{0} '.format(name)
     lines.append(line)
 
