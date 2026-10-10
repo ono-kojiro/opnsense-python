@@ -1,29 +1,33 @@
-[tool.poetry]
+[project]
 name = "opnsense-python"
 version = "0.0.1"
 description = ""
-authors = [ "Kojiro ONO <ono.kojiro@gmail.com>" ]
-readme = "README.md"
-
-packages = [{include = "opnsense", from = "src"}]
-
-[tool.poetry.dependencies]
-python = ">=3.14"
-python-dotenv = "^1.2.2"
-pytest = ">=9.0.3"
-httpx  = ">=0.28.1"
-requests = ">=2.34.2"
-pytest-order = ">=1.4.0"
-pyyaml = ">=6.0.3"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[dependency-groups]
-dev = [
-    "pytest (>=9.0.3,<10.0.0)"
+authors = [
+  { name = "Kojiro ONO", email = "ono.kojiro@gmail.com" }
 ]
 
-[tool.poetry.scripts]
+readme = "README.md"
+
+dependencies = [
+  "python-dotenv>=1.2.2",
+  "requests>=2.34.2",
+  "pyyaml>=6.0.3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.0.3",
+  "pytest-order>=1.4.0",
+  "anyio>=4.15.1",
+]
+
+[tool.setuptools.packages]
+find = { where = [ "src"] }
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
 opncli = "opnsense.opncli:main"
+
