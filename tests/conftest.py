@@ -20,14 +20,18 @@ from opnsense.interfaces.settings import InterfacesSettingsAPI
 # プロジェクトルートの .env を読み込む
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
+# read .base_url
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".base_url"))
+
+
 @pytest.fixture(scope="session")
 def opnsense_credentials():
-    key = os.getenv("OPNSENSE_KEY")
-    secret = os.getenv("OPNSENSE_SECRET")
-    base_url = os.getenv("OPNSENSE_BASE_URL", "https://localhost:8443")
+    key = os.getenv("key")
+    secret = os.getenv("secret")
+    base_url = os.getenv("base_url")
 
     if not key or not secret:
-        raise RuntimeError("OPNSENSE_KEY / OPNSENSE_SECRET が .env に設定されていません")
+        raise RuntimeError("key / secretが .env に設定されていません")
 
     return {
         "key": key,
