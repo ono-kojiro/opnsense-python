@@ -104,3 +104,26 @@ $ opncli netsnmp service status
 $ opncli netsnmp user del_user --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
+## test
+
+edit .env file
+
+```
+key='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+secret='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+```
+
+edit config.conf file
+
+```
+base_url=htts://192.168.122.X
+```
+
+run pytest
+
+```
+$ pytest
+```
+
+
+

@@ -20,8 +20,8 @@ from opnsense.interfaces.settings import InterfacesSettingsAPI
 # プロジェクトルートの .env を読み込む
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
-# read .base_url
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".base_url"))
+# read base_url
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config.conf"))
 
 
 @pytest.fixture(scope="session")

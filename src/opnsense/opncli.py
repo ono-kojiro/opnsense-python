@@ -69,6 +69,7 @@ def main() :
     show_help = False
     show_longhelp = False
     apikey_conf = None
+    config_conf = None
 
     args = []
     payload = {}
@@ -79,6 +80,8 @@ def main() :
         [ "output", required_argument, 0, "o" ],
         [ "verify-ssl", required_argument, 0, None ],
         [ "loglevel",   required_argument, 0, "l" ],
+        [ "apikey",   required_argument, 0, "a" ],
+        [ "config",   required_argument, 0, "c" ],
         [ None, 0, 0, None ],
     ]
 
@@ -96,7 +99,8 @@ def main() :
 
     i = 1
     while i < len(sys.argv) :
-        i = parse_option(i, sys.argv, long_options, opts, params, data, non_opts)
+        i = parse_option(i, sys.argv,
+                long_options, opts, params, data, non_opts)
         i = i + 1
 
     payload = data
@@ -186,7 +190,21 @@ def main() :
     if 'help' in opts:
         usage_command(module, controller, command, path2cls)
         sys.exit(1)
-    
+        
+    home = os.getenv("HOME")
+    config_list = []
+    config_list.append(       './config.conf')
+    config_list.append(       './.env')
+    config_list.append(home + '/.opnsense/config.conf')
+    if apikey_conf:
+        config_list.append(apikey_conf)
+    if config_conf :
+        config_list.append(config_conf)
+
+    for filepath in config_list:
+        if os.path.exists(filepath) :
+            load_dotenv(dotenv_path=filepath)
+ 
     key = os.getenv('key')
     if not key :
         print('ERROR: no environment variable, "key"')

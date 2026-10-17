@@ -1,5 +1,3 @@
-from pprint import pprint
-
 def test_auth_group_search(auth_group_api):
     api = auth_group_api
     res = api.search()
