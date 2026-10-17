@@ -21,7 +21,7 @@ ARCH=all
 OUTPUTDIR=.
 WHLPKGNAME=`echo $PKGNAME | tr '-' '_'`
 package_whl="dist/${WHLPKGNAME}-${PKGVER}-py3-none-any.whl"
-package_deb="${PKGNAME}_${PKGVEr}_${ARCH}.deb"
+package_deb="${PKGNAME}_${PKGVER}_${ARCH}.deb"
 
 help()
 {
