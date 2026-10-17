@@ -135,26 +135,50 @@ def test_firewall_add_aliases():
         name = items[uuid]['name']
         aliases[name] = 1
 
-    name = 'myhost'
-    content = '192.168.1.1'
-    desc = 'myhost'
+    items = [
+        {
+            "name": "myhost",
+            "type": "host",
+            "description": "host_myhost",
+            "content": "192.168.1.1",
+        },
+        {
+            "name": "mynetwork",
+            "type": "network",
+            "description": "nw_mynetwork",
+            "content": "192.168.1.0/24",
+        },
+
+        {
+            "name": "myport",
+            "type": "port",
+            "description": "port_myport",
+            "content": "1022",
+        },
+    ]
+
     category = 'admin'
+    for item in items :
+        name    = item['name']
+        typ     = item['type']
+        content = item['content']
+        description = item['description']
 
-    category_uuid = cat_uuids[category]
+        category_uuid = cat_uuids[category]
 
-    cmd = 'opncli firewall alias add_item name="{0}" '.format(name)
-    cmd = cmd + 'type=host content={0} enabled=1 '.format(content)
-    cmd = cmd + 'categories={0} '.format(category)
-    cmd = cmd + 'description="{0}"'.format(desc)
-    lines = run_shell(cmd)
-    data = json.loads(lines)
-    got = data['result']
-    if name in aliases :
-        exp = 'failed'
-    else :
-        exp = 'saved'
+        cmd = 'opncli firewall alias add_item name="{0}" '.format(name)
+        cmd = cmd + 'type={0} content={1} enabled=1 '.format(typ, content)
+        cmd = cmd + 'categories={0} '.format(category)
+        cmd = cmd + 'description="{0}"'.format(description)
+        lines = run_shell(cmd)
+        data = json.loads(lines)
+        got = data['result']
+        if name in aliases :
+            exp = 'failed'
+        else :
+            exp = 'saved'
 
-    assert got == exp
+        assert got == exp
 
 @pytest.mark.order(140)
 def test_firewall_add_rules():
