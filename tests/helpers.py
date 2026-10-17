@@ -50,3 +50,16 @@ def run_shell(cmd):
 
     return lines
 
+def get_categories():
+    cmd = 'opncli firewall category get'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    items = data['category']['categories']['category']
+
+    names = {}
+    for uuid in items:
+        name = items[uuid]['name']
+        names[name] = uuid
+
+    return names
+

@@ -42,6 +42,16 @@ $ opncli firewall category search_item
 $ opncli firewall category del_item uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
+```
+$ opncli firewall alias add_item name=hoge type=host \
+  content=192.168.1.254 enabled=1 \
+  categories=(uuid1),(uuid2)
+
+$ opncli firewall alias add_item  name=foo type=host \
+  content=192.168.1.254 enabled=1 \
+  categories=hoge,foo,bar
+```
+
 ### firewall::filter::add_rule
 
 ```

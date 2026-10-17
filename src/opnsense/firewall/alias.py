@@ -1,10 +1,12 @@
 import sys
+import re
+
 import textwrap
 
 from opnsense.client import OPNsenseClient
+from opnsense.firewall.category import CategoryAPI
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 class AliasAPI:
@@ -23,7 +25,36 @@ class AliasAPI:
         Add alias.
         POST /api/firewall/alias/add_item
         """
+        category_api = CategoryAPI(self.client)
+        res = category_api.get()
+        cat_uuids = res['category']['categories']['category']
+        cat2uuid = {}
+        for uuid in cat_uuids:
+            name = cat_uuids[uuid]['name']
+            cat2uuid[name] = uuid
+
         url = "{0}/add_item".format(self.base)
+        if 'category' in data['alias'] :
+            logger.error('do NOT use "category". use "categories"')
+            sys.exit(1)
+
+        ret = 0
+        values = ''
+        if 'categories' in data['alias'] :
+            tokens = re.split(r',', data['alias']['categories'])
+            for token in tokens:
+                uuid = cat2uuid.get(token, None)
+                if uuid is None :
+                    logger.error('no such alias, "{0}"'.format(token))
+                    ret = ret + 1
+                else :
+                    values = values + ',' + uuid
+        if ret :
+            sys.exit(ret)
+
+        values = re.sub(r'^,', '', values)
+        data['alias']['categories'] = values
+
         return self.client.post(url, json=data)
     
     def del_item(self, data=None, params=None):
@@ -200,7 +231,7 @@ class AliasAPI:
                   name=myalias type=host content=192.168.1.1
         '''
         msg = textwrap.dedent(msg).strip()
-        print(msg)
+        logger.debug(msg)
    
     def __search_item(self, mod, ctl, cmd):
         msg = '''
@@ -215,7 +246,7 @@ class AliasAPI:
                   | jq '.rows[] | select(.name == "myalias") | { name, type, content }'
         '''
         msg = textwrap.dedent(msg).strip()
-        print(msg)
+        logger.debug(msg)
 
     def __del_item(self, mod, ctl, cmd):
         msg = '''
@@ -225,7 +256,5 @@ class AliasAPI:
               $ opncli firewall alias del_item --uuid=xxxxx
         '''
         msg = textwrap.dedent(msg).strip()
-        print(msg)
-        pass
-
+        logger.debug(msg)
 
