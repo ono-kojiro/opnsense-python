@@ -50,9 +50,15 @@ prepare()
   python3 -m pip install -r requirements.txt
 }
 
-build()
+whl()
 {
   python3 -m build
+}
+
+build()
+{
+  whl
+  deb
 }
 
 pytest()
@@ -102,7 +108,7 @@ extract_whl()
   unzip $package_whl -d $dist_packages/
 }
 
-package()
+deb()
 {
   extract_whl
 

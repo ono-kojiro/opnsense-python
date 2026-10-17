@@ -3,6 +3,14 @@
 A developer-friendly Python wrapper for the OPNsense API.  
 Designed for automation, testing, and integration scenarios, this package exposes structured API modules (client, firewall, interfaces, VIP settings).
 
+## Prepare
+
+For developer:
+
+```
+$ sudo apt -y install yq python3-pytest python3-venv fakeroot
+```
+
 ## example
 
 ## Core::System

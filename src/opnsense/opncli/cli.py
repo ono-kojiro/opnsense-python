@@ -34,8 +34,6 @@ from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
 from opnsense.utils.category import category_add, category_clean, category_list
 
-from opnsense.utils.cli import *
-
 #from opnsense.netsnmp.general import netsnmp_get, netsnmp_set
 #from opnsense.netsnmp.service import netsnmp_reconfigure
 
