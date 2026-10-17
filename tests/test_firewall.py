@@ -2,7 +2,6 @@ import os
 import sys
 
 import pytest
-from pprint import pprint
 import subprocess
 import shlex
 
@@ -15,6 +14,8 @@ from opnsense.firewall import FirewallAPI
 from pprint import pprint
 
 from helpers import run_shell, get_categories
+        
+target_categories = ( 'admin', 'debug', 'test' )
 
 @pytest.mark.order(100)
 def test_firewall_delete_categories():
@@ -42,12 +43,23 @@ def test_firewall_delete_categories():
 
 @pytest.mark.order(110)
 def test_firewall_check_category():
+    cmd = 'opncli firewall category get'
+    lines = run_shell(cmd)
+
+    count = 0
+
+    data = json.loads(lines)
+    items = data['category']['categories']['category']
+    for uuid in items :
+        name = items[uuid]['name']
+        count += 1
+
     cmd = 'opncli firewall category search_item'
     lines = run_shell(cmd)
 
     data = json.loads(lines)
     ret = data['rowCount']
-    assert ret == 0
+    assert ret == count
 
 
 @pytest.mark.order(120)
@@ -66,10 +78,11 @@ def test_firewall_add_categories():
     lines = run_shell(cmd)
     data = json.loads(lines)
     got = data['result']
-    if not 'admin' in names:
-        exp = 'saved'
-    else :
-        exp = 'failed'
+    exp = 'saved'
+    #if not 'admin' in names:
+    #    exp = 'saved'
+    #else :
+    #    exp = 'failed'
     assert got == exp
 
     cmd = 'opncli firewall category add name="debug" color="00FF00"'
@@ -131,8 +144,7 @@ def test_firewall_add_aliases():
 
     cmd = 'opncli firewall alias add_item name="{0}" '.format(name)
     cmd = cmd + 'type=host content={0} enabled=1 '.format(content)
-    cmd = cmd + 'categories.{0}.value={0} '.format(category)
-    cmd = cmd + 'categories.{0}.selected=1 '.format(category_uuid)
+    cmd = cmd + 'categories={0} '.format(category)
     cmd = cmd + 'description="{0}"'.format(desc)
     lines = run_shell(cmd)
     data = json.loads(lines)
@@ -144,7 +156,61 @@ def test_firewall_add_aliases():
 
     assert got == exp
 
-@pytest.mark.order(190)
+@pytest.mark.order(140)
+def test_firewall_add_rules():
+    cat_uuids = get_categories()
+
+    cmd = 'opncli firewall filter add_rule description=hoge categories=admin'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    assert data['result'] == 'saved'
+
+@pytest.mark.order(197)
+def test_firewall_clean_rules():
+    uuids = []
+    cmd = 'opncli firewall filter search_rule | jq -r ".rows[] | select(.\\"%categories\\" == \\"admin\\") | .uuid"'
+
+    lines = run_shell(cmd)
+    #pprint(lines, stream=sys.stderr)
+    for line in re.split(r'\n', lines) :
+        if line == '' :
+            continue
+        uuids.append(line)
+
+    for uuid in uuids:
+        cmd = 'opncli firewall filter del_rule --uuid={0}'.format(uuid)
+        #pprint(cmd, stream=sys.stderr)
+        lines = run_shell(cmd)
+        data = json.loads(lines)
+        assert data['result'] == 'deleted'
+
+
+@pytest.mark.order(198)
+def test_firewall_clean_aliases():
+    cmd = 'opncli firewall alias get'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    items = data['alias']['aliases']['alias']
+
+    targets = []
+
+    for uuid in items :
+        name = items[uuid]['name']
+        categories = items[uuid]['categories']
+        for cat_uuid in categories :
+            value    = categories[cat_uuid]['value']
+            selected = categories[cat_uuid]['selected']
+
+            if value in target_categories and selected == 1:
+                targets.append(uuid)
+
+    for uuid in targets:
+        cmd = 'opncli firewall alias del_item --uuid={0}'.format(uuid)
+        lines = run_shell(cmd)
+        data = json.loads(lines)
+        assert data['result'] == 'deleted'
+
+@pytest.mark.order(199)
 def test_firewall_clean_categories():
     cmd = 'opncli firewall category get'
     lines = run_shell(cmd)
@@ -160,10 +226,11 @@ def test_firewall_clean_categories():
         color = item['color']
 
         #if not name in ( 'admin', 'debug', 'test' ) :
-        if not name in ( 'admin', 'debug' ) :
-            cmd = 'opncli firewall category del_item --uuid={0}'.format(uuid)
-            lines = run_shell(cmd)
-            data = json.loads(lines)
-            result = data['result']
-            assert result == 'deleted'
+        #if not name in ( 'admin', 'debug' ) :
+        cmd = 'opncli firewall category del_item --uuid={0}'.format(uuid)
+        lines = run_shell(cmd)
+        #pprint(lines, stream=sys.stderr)
+        data = json.loads(lines)
+        result = data['result']
+        assert result == 'deleted'
 

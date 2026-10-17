@@ -1,16 +1,23 @@
-from opnsense.client import OPNsenseClient
+import sys
+import re
 
+import logging
+logger = logging.getLogger(__name__)
+
+from opnsense.client import OPNsenseClient
+from opnsense.firewall.category import CategoryAPI
 
 class FilterAPI:
     """
     OPNsense Firewall Filter API
     module: firewall
     controller: filter
-    commands: get, addRule, delRule, toggleRule, searchRule, setRule, etc.
+    commands: get, add_rule, del_rule, toggleRule, search_rule, setRule, etc.
     """
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
+        self.base = "/api/firewall/filter"
 
     #
     # ───────────────────────────────────────────────
@@ -19,47 +26,86 @@ class FilterAPI:
     # ───────────────────────────────────────────────
     #
 
-    def get(self):
+    def get(self, data=None, params=None):
         """
         Get all firewall filter rules.
         GET /api/firewall/filter/get
         """
-        return self.client.get("/api/firewall/filter/get")
+        return self.client.get(f"{self.base}/get")
 
-    def search(self, query: dict | None = None):
+    def search_rule(self, data=None, params=None):
         """
         Search firewall rules.
-        POST /api/firewall/filter/searchRule
+        POST /api/firewall/filter/searc_rule
         """
-        return self.client.post("/api/firewall/filter/searchRule", json=query or {})
+        return self.client.post(
+            f"{self.base}/search_rule",
+            json=data
+        )
 
-    def add_rule(self, rule_data: dict):
+    def add_rule(self, data=None, params=None):
         """
         Add a new firewall rule.
         POST /api/firewall/filter/add_rule
         """
-        return self.client.post("/api/firewall/filter/add_rule", json=rule_data)
+        logging.debug(data)
+        if not 'description' in data['rule'] :
+            logger.error('no description for rule')
+            sys.exit(1)
 
-    def set_rule(self, uuid: str, rule_data: dict):
+        category_api = CategoryAPI(self.client)
+        res = category_api.get()
+        cat_uuids = res['category']['categories']['category']
+        cat2uuid = {}
+        for uuid in cat_uuids:
+            name = cat_uuids[uuid]['name']
+            cat2uuid[name] = uuid
+
+        ret = 0
+        values = ''
+        if 'categories' in data['rule'] :
+            tokens = re.split(r',', data['rule']['categories'])
+            for token in tokens:
+                uuid = cat2uuid.get(token, None)
+                if uuid is None :
+                    logger.error('no such category, "{0}"'.format(token))
+                    ret = ret + 1
+                else :
+                    values = values + ',' + uuid
+        if ret :
+            sys.exit(1)
+
+        values = re.sub(r'^,', '', values)
+        data['rule']['categories'] = values
+
+        return self.client.post(f"{self.base}/add_rule", json=data)
+
+    def set_rule(self, data=None, params=None):
         """
         Update an existing firewall rule.
         POST /api/firewall/filter/setRule/<uuid>
         """
-        return self.client.post(f"/api/firewall/filter/setRule/{uuid}", json=rule_data)
+        uuid = params['uuid']
+        return self.client.post(
+                  f"{self.base}/setRule/{uuid}",
+                  json=data
+               )
 
-    def delete_rule(self, uuid: str):
+    def del_rule(self, data=None, params=None):
         """
         Delete a firewall rule by UUID.
-        POST /api/firewall/filter/delRule/<uuid>
+        POST /api/firewall/filter/del_rule/<uuid>
         """
-        return self.client.post(f"/api/firewall/filter/delRule/{uuid}")
+        uuid = params['uuid']
+        return self.client.post(f"{self.base}/del_rule/{uuid}")
 
-    def toggle_rule(self, uuid: str):
+    def toggle_rule(self, data=None, params=None):
         """
         Enable/disable a firewall rule.
         POST /api/firewall/filter/toggleRule/<uuid>
         """
-        return self.client.post(f"/api/firewall/filter/toggleRule/{uuid}")
+        uuid = params['uuid']
+        return self.client.post(f"{self.base}/toggleRule/{uuid}")
 
     #
     # ───────────────────────────────────────────────
@@ -67,12 +113,12 @@ class FilterAPI:
     # ───────────────────────────────────────────────
     #
 
-    def apply(self, data=None):
+    def apply(self, data=None, params=None):
         """
         Apply firewall changes.
         POST /api/firewall/filter/apply
         """
-        return self.client.post("/api/firewall/filter/apply")
+        return self.client.post(f"{self.base}/apply")
 
     #
     # ───────────────────────────────────────────────

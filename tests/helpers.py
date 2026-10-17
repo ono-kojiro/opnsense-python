@@ -36,8 +36,7 @@ def proc2json(proc):
     return json.loads(lines)
 
 def run_shell(cmd):
-    args = shlex.split(cmd)
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     lines = ''
     while True:
@@ -48,6 +47,7 @@ def run_shell(cmd):
         line = str(line.rstrip())
         lines = lines + '\n' + line
 
+    lines = re.sub(r'^\n', '', lines)
     return lines
 
 def get_categories():
