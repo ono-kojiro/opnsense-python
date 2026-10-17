@@ -5,6 +5,12 @@ Designed for automation, testing, and integration scenarios, this package expose
 
 ## example
 
+## Core::System
+
+```
+$ opncli core system status
+```
+
 ### firewall::alias
 
 ```
@@ -116,7 +122,7 @@ secret='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 edit config.conf file
 
 ```
-base_url=htts://192.168.122.X
+target=192.168.122.X
 ```
 
 run pytest

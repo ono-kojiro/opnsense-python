@@ -47,6 +47,8 @@ logger = logging.getLogger(__name__)
 
 from opnsense.utils.optparser import *
 
+from .usage import *
+
 from pprint import pprint
 
 no_argument       = 0
@@ -82,13 +84,17 @@ def main() :
         [ "loglevel",   required_argument, 0, "l" ],
         [ "apikey",   required_argument, 0, "a" ],
         [ "config",   required_argument, 0, "c" ],
+        [ "target",   required_argument, 0, "t" ],
         [ None, 0, 0, None ],
     ]
 
     mod2ctl = {}
 
-    path2cls = find_api_modules(pathlib.Path(__file__).parent, PACKAGE_ROOT)
-    logger.info(path2cls)
+    path2cls = find_api_modules(
+                    pathlib.Path(__file__).parent.parent,
+                    PACKAGE_ROOT
+                )
+    logger.debug('path2cls is {0}'.format(path2cls))
 
     mod2ctl = find_controllers(path2cls)
 
@@ -102,9 +108,7 @@ def main() :
         i = parse_option(i, sys.argv,
                 long_options, opts, params, data, non_opts)
         i = i + 1
-
     payload = data
-    logger.debug('payload is {0}'.format(payload))
     
     if ret != 0:
         sys.exit(1)
@@ -127,6 +131,24 @@ def main() :
         print('ERROR: unknown loglevel, {0}'.format(loglevel), file=sys.stderr)
         sys.exit(1)
     
+    home = os.getenv("HOME")
+    config_list = []
+    config_list.append(       './config.conf')
+    config_list.append(       './.env')
+    config_list.append(home + '/.opnsense/config.conf')
+    if apikey_conf:
+        config_list.append(apikey_conf)
+    if config_conf :
+        config_list.append(config_conf)
+
+    for filepath in config_list:
+        logger.debug('config_list: {0}'.format(filepath))
+        if os.path.exists(filepath) :
+            logger.debug('read config "{0}"'.format(filepath))
+            load_dotenv(dotenv_path=filepath)
+    
+    logger.debug('payload is {0}'.format(payload))
+    
     # DEFAULT  level:name:message
     #format = '%(levelname)s:%(name)s:%(message)s'
     # CUSTOM (add space)
@@ -148,12 +170,28 @@ def main() :
     controller = None
     command = None
 
-    target     = list_get(non_opts, 0, None)
-    module     = list_get(non_opts, 1, None)
-    controller = list_get(non_opts, 2, None)
-    command    = list_get(non_opts, 3, None)
+    optind = 0
+
+    logger.debug('DEBUG: check "target" from option')
+    target = opts.get('target', None)
+    if not target :
+        logger.debug('DEBUG: target is not defined in option')
+        logger.debug('DEBUG: get target from environment variable')
+        target = os.getenv("target")
+        if target :
+            logger.debug('DEBUG: got target, {0}'.format(target))
+        else :
+            logger.debug('DEBUG: not found target')
+
+    module     = list_get(non_opts, optind, None)
+    optind += 1
+    controller = list_get(non_opts, optind, None)
+    optind += 1
+    command    = list_get(non_opts, optind, None)
+    optind += 1
 
     if target is None :
+        logger.debug('DEBUG: target is not defined')
         usage_target(path2cls, mod2ctl)
         sys.exit(1)
 
@@ -163,6 +201,7 @@ def main() :
         sys.exit(1)
 
     if not module in mod2ctl :
+        logger.debug(mod2ctl)
         print('ERROR: no such module, {0}'.format(module))
         usage_base(path2cls, mod2ctl)
         sys.exit(1) 
@@ -191,19 +230,6 @@ def main() :
         usage_command(module, controller, command, path2cls)
         sys.exit(1)
         
-    home = os.getenv("HOME")
-    config_list = []
-    config_list.append(       './config.conf')
-    config_list.append(       './.env')
-    config_list.append(home + '/.opnsense/config.conf')
-    if apikey_conf:
-        config_list.append(apikey_conf)
-    if config_conf :
-        config_list.append(config_conf)
-
-    for filepath in config_list:
-        if os.path.exists(filepath) :
-            load_dotenv(dotenv_path=filepath)
  
     key = os.getenv('key')
     if not key :

@@ -1,29 +1,13 @@
 import os
 import sys
 
-import pytest
 from pprint import pprint
 import subprocess
 import shlex
 
 import re
 
-def check_message(proc, msg):
-    ret = 1
-    while True:
-        line = proc.stdout.readline()
-        if not line:
-            break
-        
-        line = str(line.rstrip())
-
-        print(line, file=sys.stderr)
-
-        exp = msg
-        m = re.search(exp, str(line))
-        if m :
-            ret = 0
-    return ret
+from helpers import check_message
 
 def test_cli():
     cmd = 'opncli'
@@ -48,13 +32,7 @@ def test_cli_core():
     assert ret == 1
 
 def test_cli_core_system_status():
-    print('\ntest_cli_core_system_status\n', file=sys.stderr)
-    key = os.getenv("key")
-    secret = os.getenv("secret")
-    base_url = os.getenv("base_url")
-    ip = re.sub(r'.*//', '', base_url)
-
-    cmd = 'opncli {0} core system status'.format(ip)
+    cmd = 'opncli core system status'
     args = shlex.split(cmd)
     proc = subprocess.Popen(args, stdout=subprocess.PIPE)
 
@@ -63,3 +41,12 @@ def test_cli_core_system_status():
     assert ret == 0
 
 
+def test_cli_core_system_status_with_target():
+    target = os.getenv("target")
+    cmd = 'opncli core system status -t {0}'.format(target)
+    args = shlex.split(cmd)
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+
+    msg = '"dialogTitle": "System Status"'
+    ret = check_message(proc, msg)
+    assert ret == 0

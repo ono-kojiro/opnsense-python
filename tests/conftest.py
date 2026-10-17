@@ -1,6 +1,8 @@
 import os
 import pytest
 
+import json
+
 from dotenv import load_dotenv
 
 from opnsense.client import OPNsenseClient
@@ -22,7 +24,6 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 # read base_url
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config.conf"))
-
 
 @pytest.fixture(scope="session")
 def opnsense_credentials():
@@ -90,4 +91,37 @@ def firewall_api(opnsense_client):
 @pytest.fixture
 def interfaces_settings_api(opnsense_client):
     return InterfacesSettingsAPI(opnsense_client)
+
+def check_message(proc, msg):
+    ret = 1
+    while True:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        
+        line = str(line.rstrip())
+
+        print(line, file=sys.stderr)
+
+        exp = msg
+        m = re.search(exp, str(line))
+        if m :
+            ret = 0
+    return ret
+
+def proc2json(proc):
+    lines = ''
+
+    while True:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        
+        line = str(line.rstrip())
+        lines = lines + '\n' + line
+
+    return json.loads(lines)
+
+def hoge():
+    print('hoge')
 

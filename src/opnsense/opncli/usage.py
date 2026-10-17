@@ -210,6 +210,12 @@ def usage_base(api_modules, mod2ctl) :
     secret: OPNsense Secret
 '''
     print(msg, file=sys.stderr)
+    
+    msg = '''
+  Examples:
+    $ opncli 192.168.122.10 core system status
+'''
+    print(msg, file=sys.stderr)
 
 def usage_target(modpath2cls, mod2ctl):
     usage_base(modpath2cls, mod2ctl)
