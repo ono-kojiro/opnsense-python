@@ -8,7 +8,8 @@ Designed for automation, testing, and integration scenarios, this package expose
 For developer:
 
 ```
-$ sudo apt -y install yq python3-pytest python3-venv fakeroot
+$ sudo apt -y install yq fakeroot \
+  python3-pytest python3-dotenv python3-venv python3-build
 ```
 
 ## example
