@@ -5,13 +5,13 @@ cd $top_dir
 
 flags=""
 
-if [ ! -d myenv ]; then
-    python3 -m venv myenv
-fi
+#if [ ! -d myenv ]; then
+#    python3 -m venv myenv
+#fi
 
-if [ -f myenv/bin/activate ]; then
-  . myenv/bin/activate
-fi
+#if [ -f myenv/bin/activate ]; then
+#  . myenv/bin/activate
+#fi
 
 PKGNAME=`tomlq -r '.project.name' pyproject.toml`
 PKGVER=`tomlq -r '.project.version' pyproject.toml`
@@ -51,14 +51,14 @@ prepare()
   python3 -m pip install .[dev]
 }
 
-whl()
+wheel()
 {
   python3 -m build
 }
 
 build()
 {
-  whl
+  wheel 
   deb
 }
 
@@ -93,6 +93,12 @@ sysuninstall()
 sysuninst()
 {
   sysuninstall
+}
+
+sysreinst()
+{
+  sysuninstall
+  sysinstall
 }
 
 test()

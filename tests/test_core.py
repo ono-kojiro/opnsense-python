@@ -41,4 +41,3 @@ def test_core_menu_tree(core_menu_api):
     assert lobby_exists
     assert system_exists
 
-

@@ -27,9 +27,11 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config.co
 
 @pytest.fixture(scope="session")
 def opnsense_credentials():
+    target = os.getenv("target")
     key = os.getenv("key")
     secret = os.getenv("secret")
-    base_url = os.getenv("base_url")
+    
+    base_url = 'https://{0}'.format(target)
 
     if not key or not secret:
         raise RuntimeError("key / secretが .env に設定されていません")

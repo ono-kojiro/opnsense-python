@@ -17,7 +17,6 @@ from helpers import run_shell, get_categories
         
 target_categories = ( 'admin', 'debug', 'test' )
 
-@pytest.mark.order(100)
 def test_firewall_delete_categories():
     cmd = 'opncli firewall category get'
     lines = run_shell(cmd)
@@ -41,7 +40,6 @@ def test_firewall_delete_categories():
         result = data['result']
         assert result == 'deleted'
 
-@pytest.mark.order(110)
 def test_firewall_check_category():
     cmd = 'opncli firewall category get'
     lines = run_shell(cmd)
@@ -62,7 +60,6 @@ def test_firewall_check_category():
     assert ret == count
 
 
-@pytest.mark.order(120)
 def test_firewall_add_categories():
     cmd = 'opncli firewall category get'
     lines = run_shell(cmd)
@@ -105,7 +102,6 @@ def test_firewall_add_categories():
         exp = 'failed'
     assert got == exp
 
-@pytest.mark.order(130)
 def test_firewall_delete_aliases():
     cmd = 'opncli firewall alias get'
     lines = run_shell(cmd)
@@ -119,7 +115,6 @@ def test_firewall_delete_aliases():
 
     assert count != 0
 
-@pytest.mark.order(131)
 def test_firewall_add_aliases():
     cat_uuids = get_categories()
 
@@ -180,7 +175,6 @@ def test_firewall_add_aliases():
 
         assert got == exp
 
-@pytest.mark.order(140)
 def test_firewall_add_rules():
     cat_uuids = get_categories()
 
@@ -189,7 +183,6 @@ def test_firewall_add_rules():
     data = json.loads(lines)
     assert data['result'] == 'saved'
 
-@pytest.mark.order(197)
 def test_firewall_clean_rules():
     uuids = []
     cmd = 'opncli firewall filter search_rule | jq -r ".rows[] | select(.\\"%categories\\" == \\"admin\\") | .uuid"'
@@ -209,7 +202,6 @@ def test_firewall_clean_rules():
         assert data['result'] == 'deleted'
 
 
-@pytest.mark.order(198)
 def test_firewall_clean_aliases():
     cmd = 'opncli firewall alias get'
     lines = run_shell(cmd)
@@ -234,7 +226,6 @@ def test_firewall_clean_aliases():
         data = json.loads(lines)
         assert data['result'] == 'deleted'
 
-@pytest.mark.order(199)
 def test_firewall_clean_categories():
     cmd = 'opncli firewall category get'
     lines = run_shell(cmd)

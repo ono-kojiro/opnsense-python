@@ -170,16 +170,16 @@ def main() :
 
     optind = 0
 
-    logger.debug('DEBUG: check "target" from option')
+    logger.debug('check "target" from option')
     target = opts.get('target', None)
     if not target :
-        logger.debug('DEBUG: target is not defined in option')
-        logger.debug('DEBUG: get target from environment variable')
+        logger.debug('target is not defined in option')
+        logger.debug('get target from environment variable')
         target = os.getenv("target")
         if target :
-            logger.debug('DEBUG: got target, {0}'.format(target))
+            logger.debug('got target, {0}'.format(target))
         else :
-            logger.debug('DEBUG: not found target')
+            logger.debug('not found target')
 
     module     = list_get(non_opts, optind, None)
     optind += 1
@@ -189,7 +189,7 @@ def main() :
     optind += 1
 
     if target is None :
-        logger.debug('DEBUG: target is not defined')
+        logger.error('target is not defined')
         usage_target(path2cls, mod2ctl)
         sys.exit(1)
 

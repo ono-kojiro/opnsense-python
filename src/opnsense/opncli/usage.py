@@ -187,17 +187,22 @@ def usage_base(api_modules, mod2ctl) :
 
     lines = []
     line = 'usage: {0} '.format(prog)
-    line = line + 'TARGET MODULE CONTROLLER COMMAND [OPTIONS]'
+    line = line + 'MODULE CONTROLLER COMMAND [OPTIONS]'
     lines.append(line)
 
     msg = '''
-  TARGET:  IP address of target OPNsense
   MODULE:  core, interfaces, firewall and so on...
   CONTROLLERS: system(for core), settings(for interfaces) and so on...
   COMMAND: get, set and so on (depend on MODULE)
 '''
     lines.append(msg)
     
+    msg = '''
+    -t, --target TARGET       IP address of target OPNsense
+    -c, --config CONFIG       configuration file including key and secret
+    -l, --loglevel LEVEL      log level, debug, info and so on...
+'''
+
     for line in lines:
         print('{0}'.format(line), file=sys.stderr)
 
