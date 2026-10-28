@@ -109,6 +109,25 @@ extract_whl()
   unzip $package_whl -d $dist_packages/
 }
 
+control()
+{
+  set -a
+  export maintainer=`git config --get user.name`
+  export email=`git config --get user.email`
+
+  export PKGNAME=${PKGNAME}
+  export PKGVER=${PKGVER}
+  cat control.in \
+      | envsubst '${PKGNAME} ${maintainer} ${email} ${PKGVER}' \
+      > debian/control
+  set +a
+}
+
+package()
+{
+  dpkg-buildpackage -us -uc
+}
+
 deb()
 {
   extract_whl
