@@ -207,7 +207,7 @@ def usage_base(api_modules, mod2ctl) :
         print('{0}'.format(line), file=sys.stderr)
 
     print_available_modules(module_names)
-    print_available_controllers(module_names, mod2ctl)
+    #print_available_controllers(module_names, mod2ctl)
 
     msg = '''
   Environment Variables:

@@ -41,7 +41,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import logging
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 from opnsense.utils.optparser import *
 
@@ -92,7 +92,7 @@ def main() :
                     pathlib.Path(__file__).parent.parent,
                     PACKAGE_ROOT
                 )
-    logger.debug('path2cls is {0}'.format(path2cls))
+    logging.debug('path2cls is {0}'.format(path2cls))
 
     mod2ctl = find_controllers(path2cls)
 
@@ -119,7 +119,7 @@ def main() :
     elif loglevel in ('warn', 'warning') :
         level = logging.WARNING
     elif loglevel in ('debug'):
-        print('DEBUG: enable debug', file=sys.stderr)
+        logging.debug('DEBUG: enable debug')
         level = logging.DEBUG
     elif loglevel in ('error'):
         level = logging.ERROR
@@ -128,7 +128,19 @@ def main() :
     else :
         print('ERROR: unknown loglevel, {0}'.format(loglevel), file=sys.stderr)
         sys.exit(1)
+    # DEFAULT  level:name:message
+    #fmt = '%(levelname)s:%(name)s:%(message)s'
+    fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # CUSTOM (add space)
+    #fmt = '%(levelname)s:%(name)s: %(message)s'
+    #fmt = '%(name)s: %(message)s'
+    #fmt = '%(message)s'
     
+    logging.basicConfig(level=level, format=fmt)
+    logger = logging.getLogger(__name__)
+    #logger.setLevel(level)
+    #logger.setFormatter(fmt)
+
     home = os.getenv("HOME")
     config_list = []
     config_list.append(       './config.conf')
@@ -141,19 +153,13 @@ def main() :
 
     for filepath in config_list:
         logger.debug('config_list: {0}'.format(filepath))
+        print('config_list: {0}'.format(filepath), file=sys.stderr)
         if os.path.exists(filepath) :
             logger.debug('read config "{0}"'.format(filepath))
             load_dotenv(dotenv_path=filepath)
     
     logger.debug('payload is {0}'.format(payload))
     
-    # DEFAULT  level:name:message
-    #format = '%(levelname)s:%(name)s:%(message)s'
-    # CUSTOM (add space)
-    #fmt = '%(levelname)s:%(name)s: %(message)s'
-    fmt = '%(message)s'
-    
-    logging.basicConfig(level=level, format=fmt)
 
     if 'output' in opts:
         output = opts['output']

@@ -3,16 +3,6 @@
 top_dir="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 cd $top_dir
 
-flags=""
-
-#if [ ! -d myenv ]; then
-#    python3 -m venv myenv
-#fi
-
-#if [ -f myenv/bin/activate ]; then
-#  . myenv/bin/activate
-#fi
-
 PKGNAME=`tomlq -r '.project.name' pyproject.toml`
 PKGVER=`tomlq -r '.project.version' pyproject.toml`
 SCRIPT_ENTRY=`tomlq -r '.project.scripts.opncli' pyproject.toml`
@@ -22,6 +12,8 @@ OUTPUTDIR=.
 WHLPKGNAME=`echo $PKGNAME | tr '-' '_'`
 package_whl="dist/${WHLPKGNAME}-${PKGVER}-py3-none-any.whl"
 package_deb="${PKGNAME}_${PKGVER}_${ARCH}.deb"
+
+flags=""
 
 help()
 {
@@ -69,36 +61,20 @@ pytest()
 
 install()
 {
-  python3 -m pip install -e .
-  python3 -m pip install .[dev]
-}
-
-sysinstall()
-{
   cp -f ${package_deb} /tmp/
   sudo apt -y install /tmp/${package_deb}
   rm -f /tmp/${package_deb}
 }
 
-sysinst()
-{
-  sysinstall
-}
-
-sysuninstall()
+uninstall()
 {
   sudo apt -y remove --purge ${PKGNAME}
 }
 
-sysuninst()
+reinst()
 {
-  sysuninstall
-}
-
-sysreinst()
-{
-  sysuninstall
-  sysinstall
+  uninstall
+  install
 }
 
 test()
@@ -156,9 +132,6 @@ EOS
 
    mkdir -p $DESTDIR/usr/bin/
    cp -f opncli $DESTDIR/usr/bin/
-#  cp -f postinst $DESTDIR/DEBIAN/
-#  cp -f postrm   $DESTDIR/DEBIAN/
-#  cp -f prerm    $DESTDIR/DEBIAN/
   fakeroot dpkg-deb --build $DESTDIR $OUTPUTDIR
   echo "done"
 }
