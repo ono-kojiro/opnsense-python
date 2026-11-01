@@ -42,13 +42,15 @@ $ opncli firewall alias reconfigure
 ### firewall::category
 
 ```
+$ opncli firewall category add_item name=red  color="ff0000"
 $ opncli firewall category add_item name=blue color="0000ff"
 $ opncli firewall category get
 ```
 
 ```
 $ opncli firewall category search_item
-$ opncli firewall category del_item uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+$ opncli firewall category del_item --uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+$ opncli firewall category del_item --name=red
 ```
 
 ```
@@ -64,7 +66,7 @@ $ opncli firewall alias add_item  name=foo type=host \
 ### firewall::filter::add_rule
 
 ```
-opncli firewall filter add_rule \
+$ opncli firewall filter add_rule \
   enabled=1 \
   action=pass \
   interface=wan \
@@ -73,10 +75,13 @@ opncli firewall filter add_rule \
   protocol=ICMP \
   source_net=any \
   destination_net=wanip \
-  descr="allow PING from wan to this firewall" \
+  description="allow PING from wan to this firewall" \
   quick=1 \
   statetype=keep \
+  categories=red \
   sequence=111
+
+$ opncli firewall filter apply
 ```
 
 ## Core::Firmware
