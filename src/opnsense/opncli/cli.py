@@ -34,14 +34,11 @@ from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
 from opnsense.utils.category import category_add, category_clean, category_list
 
-#from opnsense.netsnmp.general import netsnmp_get, netsnmp_set
-#from opnsense.netsnmp.service import netsnmp_reconfigure
-
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import logging
-#logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 from opnsense.utils.optparser import *
 
@@ -52,6 +49,33 @@ from pprint import pprint
 no_argument       = 0
 required_argument = 1
 optional_argument = 2
+
+def setup_logging(logfile, debug):
+
+    fmt = logging.Formatter(
+        "%(asctime)s %(levelname)s %(name)s: %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S%z",
+    )
+
+    if logfile :
+        # FileHandler
+        handler = logging.FileHandler(
+            logfile,
+            mode='w',
+        )
+    else :
+        handler = logging.StreamHandler(sys.stdout)
+
+    handler.setFormatter(fmt)
+
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    
+    if debug :
+        root.setLevel(logging.DEBUG)
+    else :
+        root.setLevel(logging.INFO)
 
 def list_get(lst, idx, default):
     try:
@@ -79,10 +103,11 @@ def main() :
         [ "help",   no_argument,       0, "h" ],
         [ "output", required_argument, 0, "o" ],
         [ "verify-ssl", required_argument, 0, None ],
-        [ "loglevel",   required_argument, 0, "l" ],
+        [ "logfile",   required_argument, 0, "l" ],
         [ "apikey",   required_argument, 0, "a" ],
         [ "config",   required_argument, 0, "c" ],
         [ "target",   required_argument, 0, "t" ],
+        [ "debug",  no_argument, 0, "d" ],
         [ None, 0, 0, None ],
     ]
 
@@ -100,6 +125,8 @@ def main() :
     params = {}
     data = {}
     non_opts = []
+    logfile = None
+    debug = False
 
     i = 1
     while i < len(sys.argv) :
@@ -111,35 +138,12 @@ def main() :
     if ret != 0:
         sys.exit(1)
    
-    if 'loglevel' in opts:
-        loglevel = opts['loglevel']
+    debug = opts.get('debug', False)
+    logfile = opts.get('logfile', None)
 
-    if loglevel in ('info'):
-        level = logging.INFO
-    elif loglevel in ('warn', 'warning') :
-        level = logging.WARNING
-    elif loglevel in ('debug'):
-        logging.debug('DEBUG: enable debug')
-        level = logging.DEBUG
-    elif loglevel in ('error'):
-        level = logging.ERROR
-    elif loglevel in ('critical'):
-        level = logging.CRITICAL
-    else :
-        print('ERROR: unknown loglevel, {0}'.format(loglevel), file=sys.stderr)
-        sys.exit(1)
     # DEFAULT  level:name:message
     #fmt = '%(levelname)s:%(name)s:%(message)s'
-    fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    # CUSTOM (add space)
-    #fmt = '%(levelname)s:%(name)s: %(message)s'
-    #fmt = '%(name)s: %(message)s'
-    #fmt = '%(message)s'
-    
-    logging.basicConfig(level=level, format=fmt)
-    logger = logging.getLogger(__name__)
-    #logger.setLevel(level)
-    #logger.setFormatter(fmt)
+    setup_logging(logfile, debug)
 
     home = os.getenv("HOME")
     config_list = []
@@ -153,13 +157,12 @@ def main() :
 
     for filepath in config_list:
         logger.debug('config_list: {0}'.format(filepath))
-        print('config_list: {0}'.format(filepath), file=sys.stderr)
         if os.path.exists(filepath) :
-            logger.debug('read config "{0}"'.format(filepath))
+            logger.debug('read config, {0}'.format(filepath))
             load_dotenv(dotenv_path=filepath)
     
+    logger.debug('sys.argv is {0}'.format(sys.argv))
     logger.debug('payload is {0}'.format(payload))
-    
 
     if 'output' in opts:
         output = opts['output']
@@ -178,7 +181,7 @@ def main() :
 
     logger.debug('check "target" from option')
     target = opts.get('target', None)
-    if not target :
+    if target is None:
         logger.debug('target is not defined in option')
         logger.debug('get target from environment variable')
         target = os.getenv("target")
@@ -249,6 +252,11 @@ def main() :
     base_url = 'https://{0}'.format(target)
     
     logger.debug('OPNsenseClient')
+    
+    logger.debug(sys.argv)
+    logger.debug(data)
+    logger.debug(payload)
+
 
     client = OPNsenseClient(
         base_url=base_url,

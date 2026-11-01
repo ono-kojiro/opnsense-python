@@ -29,6 +29,14 @@ def init_options(long_options):
 
     return opts
 
+def remove_quotes(value) :
+    if value:
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+        elif value.startswith("'") and value.endswith("'"):
+            value = value[1:-1]
+    return value
+
 def parse_option(i, args, long_options, opts, params, data, non_opts):
     arg = args[i]
 
@@ -40,10 +48,12 @@ def parse_option(i, args, long_options, opts, params, data, non_opts):
         has_arg   = long_options[l][1]
         short_opt = long_options[l][3]
 
-        m = re.search(r'^(--{0}|-{1})(=([^ ]+))?'.format(long_opt, short_opt), arg)
+        m = re.search(r'^(--{0}|-{1})(=(.+))?'.format(long_opt, short_opt), arg)
         if m :
             name  = long_opt
             value = m.group(3)
+            value = remove_quotes(value)
+
             if has_arg and not value :
                 i = i + 1
                 if i >= len(args) :
@@ -67,19 +77,21 @@ def parse_option(i, args, long_options, opts, params, data, non_opts):
             logger.debug(msg)
 
     while not name :
-        m = re.search(r'^(--([^=]+))(=([^ ]+))?', arg)
+        m = re.search(r'^(--([^=]+))(=(.+))?', arg)
         if m :
             name  = m.group(2)
             value = m.group(4)
+            value = remove_quotes(value)
             msg = "use as parameter, {0}, {1}".format(name, value)
             logger.debug(msg)
             params[name] = value
             break
 
-        m = re.search(r'^([^=]+)=([^ ]+)', arg)
+        m = re.search(r'^([^=]+)=(.+)', arg)
         if m :
             name  = m.group(1)
             value = m.group(2)
+            value = remove_quotes(value)
             data[name] = value
             break
             

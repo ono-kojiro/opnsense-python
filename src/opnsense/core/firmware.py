@@ -19,7 +19,9 @@ class CoreFirmwareAPI:
     def __show_options(self):
         print('  OPTIONS:')
         print('    EX. --pkg_name=os-net-snmp')
-    
+        print('')
+        print('    $ snmpwalk 192.168.1.X')
+
     def __install(self, mod, ctl, cmd):
         self.__show_options()
 

@@ -71,7 +71,7 @@ uninstall()
   sudo apt -y remove --purge ${PKGNAME}
 }
 
-reinst()
+reinstall()
 {
   uninstall
   install
