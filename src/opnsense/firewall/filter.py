@@ -75,6 +75,16 @@ class FilterAPI:
         if ret :
             sys.exit(1)
 
+        descr = data['rule']['description']
+
+        res = self.search_rule()
+        rows = res['rows']
+        for row in rows:
+            if row['description'] == descr :
+                logger.error('same description, uid={0}'.format(row['uuid']))
+                logger.debug(row)
+                sys.exit(1)
+
         values = re.sub(r'^,', '', values)
         data['rule']['categories'] = values
 
