@@ -14,10 +14,24 @@ $ sudo apt -y install yq fakeroot \
 
 ## example
 
-## Core::System
+### Core::System
 
 ```
 $ opncli core system status
+```
+
+### interfaces::assignment
+
+```
+$ opncli interfaces assignment get
+$ opncli interfaces assignment search_item
+```
+
+### interfaces::vip_settings
+
+```
+$ opncli interfaces vip_settings get
+$ opncli interfaces vip_settings search_item
 ```
 
 ### firewall::alias
