@@ -20,10 +20,10 @@ from opnsense.firewall import FirewallAPI
 from opnsense.interfaces.settings import InterfacesSettingsAPI
 
 # プロジェクトルートの .env を読み込む
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "apikey.shrc"))
 
 # read base_url
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config.conf"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config.shrc"))
 
 @pytest.fixture(scope="session")
 def opnsense_credentials():

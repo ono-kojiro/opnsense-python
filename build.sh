@@ -130,8 +130,21 @@ Depends: python3, python3-dotenv, python3-requests, python3-yaml
 Description: $PKGNAME
 EOS
 
-   mkdir -p $DESTDIR/usr/bin/
-   cp -f opncli $DESTDIR/usr/bin/
+  mkdir -p $DESTDIR/usr/bin/
+
+  cat - << EOF > $DESTDIR/usr/bin/opncli
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import re
+import sys
+from opnsense.opncli import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
+EOF
+
+  chmod 755 $DESTDIR/usr/bin/
   fakeroot dpkg-deb --build $DESTDIR $OUTPUTDIR
   echo "done"
 }

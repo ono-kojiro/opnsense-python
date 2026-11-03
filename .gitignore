@@ -1,6 +1,9 @@
 *.deb
 config.conf
 work/
+opncli
+apikey.shrc
+config.shrc
 
 *~
 .python-version

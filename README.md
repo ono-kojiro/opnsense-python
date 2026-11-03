@@ -12,6 +12,19 @@ $ sudo apt -y install yq fakeroot \
   python3-pytest python3-dotenv python3-venv python3-build
 ```
 
+## apikey.shrc
+
+```
+key='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+secret='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+```
+
+## config.shrc
+
+```
+target='192.168.122.3'
+```
+
 ## example
 
 ### Core::System
