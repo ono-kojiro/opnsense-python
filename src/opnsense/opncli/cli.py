@@ -147,9 +147,9 @@ def main() :
 
     home = os.getenv("HOME")
     config_list = []
-    config_list.append(       './config.conf')
-    config_list.append(       './.env')
-    config_list.append(home + '/.opnsense/config.conf')
+    config_list.append(       './config.shrc')
+    config_list.append(       './apikey.shrc')
+    config_list.append(home + '/.opnsense/config.shrc')
     if apikey_conf:
         config_list.append(apikey_conf)
     if config_conf :
@@ -269,14 +269,15 @@ def main() :
     logger.debug('controller : {0}'.format(controller))
     logger.debug('command    : {0}'.format(command))
 
-    if controller == 'filter' :
-        data = {
-          'rule' : payload
-        }
-    else :
-        data = {
-          controller : payload
-        }
+    model_map = {
+        'filter' : 'rule',
+        'vip_settings' : 'vip',
+    }
+
+    root_key = model_map.get(controller, controller)
+    data = {
+        root_key: payload,
+    }
     
     logger.debug('Payload: {0}'.format(data))
 
