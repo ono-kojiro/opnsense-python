@@ -108,6 +108,18 @@ confirm plugins:
 
 ```
 $ opncli core firmware get
+{
+    "firmware": {
+        "mirror": "",
+        "flavour": "",
+        "plugins": "os-net-snmp",
+        "type": "",
+        "subscription": "",
+        "reboot": "0",
+        "aux": "0"
+    }
+}
+
 ```
 
 ### netsnmp::user::get
