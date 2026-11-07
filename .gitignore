@@ -1,7 +1,6 @@
 *.deb
 config.conf
 work/
-opncli
 apikey.shrc
 config.shrc
 
