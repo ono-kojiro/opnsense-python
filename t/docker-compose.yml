@@ -1,0 +1,129 @@
+---
+services:
+  inetterm:
+    image: ${IMAGE}
+    container_name: inetterm
+    hostname: inetterm
+    restart: always
+    stdin_open: true
+    tty: true
+
+    cap_add:
+    - NET_ADMIN
+
+    environment:
+      TZ: ${TIMEZONE}
+      LDAP_URI: ${LDAP_URI}
+      LDAP_BASE: ${LDAP_BASE}
+      LDAP_START_TLS: ${LDAP_START_TLS}
+      LDAP_TLS_REQCERT: ${LDAP_TLS_REQCERT}
+      LDAP_ALLOW_GROUPS: ${LDAP_ALLOW_GROUPS}
+
+    networks:
+      inet:
+        ipv4_address: 172.16.99.199
+  
+  opt1term:
+    image: ${IMAGE}
+    container_name: opt1term
+    hostname: opt1term
+    restart: always
+    stdin_open: true
+    tty: true
+
+    cap_add:
+    - NET_ADMIN
+
+    environment:
+      TZ: ${TIMEZONE}
+      LDAP_URI: ${LDAP_URI}
+      LDAP_BASE: ${LDAP_BASE}
+      LDAP_START_TLS: ${LDAP_START_TLS}
+      LDAP_TLS_REQCERT: ${LDAP_TLS_REQCERT}
+      LDAP_ALLOW_GROUPS: ${LDAP_ALLOW_GROUPS}
+
+    networks:
+      opt1:
+        ipv4_address: 172.16.1.101
+  
+  opt2erm:
+    image: ${IMAGE}
+    container_name: opt2term
+    hostname: opt2term
+    restart: always
+    stdin_open: true
+    tty: true
+
+    cap_add:
+    - NET_ADMIN
+
+    environment:
+      TZ: ${TIMEZONE}
+      LDAP_URI: ${LDAP_URI}
+      LDAP_BASE: ${LDAP_BASE}
+      LDAP_START_TLS: ${LDAP_START_TLS}
+      LDAP_TLS_REQCERT: ${LDAP_TLS_REQCERT}
+      LDAP_ALLOW_GROUPS: ${LDAP_ALLOW_GROUPS}
+
+    networks:
+      opt2:
+        ipv4_address: 172.16.2.102
+  
+  opt3term:
+    image: ${IMAGE}
+    container_name: opt3term
+    hostname: opt1term
+    restart: always
+    stdin_open: true
+    tty: true
+
+    cap_add:
+    - NET_ADMIN
+
+    environment:
+      TZ: ${TIMEZONE}
+      LDAP_URI: ${LDAP_URI}
+      LDAP_BASE: ${LDAP_BASE}
+      LDAP_START_TLS: ${LDAP_START_TLS}
+      LDAP_TLS_REQCERT: ${LDAP_TLS_REQCERT}
+      LDAP_ALLOW_GROUPS: ${LDAP_ALLOW_GROUPS}
+
+    networks:
+      opt3:
+        ipv4_address: 172.16.3.103
+  
+  opt4term:
+    image: ${IMAGE}
+    container_name: opt4term
+    hostname: opt4term
+    restart: always
+    stdin_open: true
+    tty: true
+
+    cap_add:
+    - NET_ADMIN
+
+    environment:
+      TZ: ${TIMEZONE}
+      LDAP_URI: ${LDAP_URI}
+      LDAP_BASE: ${LDAP_BASE}
+      LDAP_START_TLS: ${LDAP_START_TLS}
+      LDAP_TLS_REQCERT: ${LDAP_TLS_REQCERT}
+      LDAP_ALLOW_GROUPS: ${LDAP_ALLOW_GROUPS}
+
+    networks:
+      opt4:
+        ipv4_address: 172.16.4.104
+
+networks:
+  inet:
+    external: true
+  opt1:
+    external: true
+  opt2:
+    external: true
+  opt3:
+    external: true
+  opt4:
+    external: true
+

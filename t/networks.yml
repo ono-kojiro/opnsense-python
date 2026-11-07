@@ -1,0 +1,32 @@
+---
+networks:
+  - name:    inet
+    parent:  inet
+    driver:  macvlan
+    gateway: 172.16.99.1
+    subnet:  172.16.99.0/24
+
+  - name:    opt1
+    parent:  opt1
+    driver:  macvlan
+    gateway: 172.16.1.1
+    subnet:  172.16.1.0/24
+  
+  - name:    opt2
+    parent:  opt2
+    driver:  macvlan
+    gateway: 172.16.2.1
+    subnet:  172.16.2.0/24
+  
+  - name:    opt3
+    parent:  opt3
+    driver:  macvlan
+    gateway: 172.16.3.1
+    subnet:  172.16.3.0/24
+
+  - name:    opt4
+    parent:  opt4
+    driver:  macvlan
+    gateway: 172.16.4.1
+    subnet:  172.16.4.0/24
+

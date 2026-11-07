@@ -1,0 +1,93 @@
+---
+filters:
+  - description: allow ICMP from opt1 to inet
+    categories: red
+    action: pass
+    interface: opt1
+    direction: in
+    ipprotocol: inet
+    protocol: ICMP
+    source_net: alias_nw_opt1
+    destination_net: alias_nw_inet
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 301
+
+  - description: allow connection from opt1 to inet
+    categories: red
+    action: pass
+    interface: opt1
+    direction: in
+    ipprotocol: inet
+    protocol: TCP
+    source_net: alias_nw_opt1
+    destination_net: alias_nw_inet
+    destination_port: any
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 101
+  
+  - description: allow connection from opt2 to inet
+    categories: red
+    action: pass
+    interface: opt2
+    direction: in
+    ipprotocol: inet
+    protocol: TCP
+    source_net: alias_nw_opt2
+    destination_net: alias_nw_inet
+    destination_port: any
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 102
+  
+  - description: allow connection from opt3 to inet
+    categories: red
+    action: pass
+    interface: opt3
+    direction: in
+    ipprotocol: inet
+    protocol: TCP
+    source_net: alias_nw_opt3
+    destination_net: alias_nw_inet
+    destination_port: any
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 103
+  
+  - description: allow connection from opt4 to inet
+    categories: red
+    action: pass
+    interface: opt4
+    direction: in
+    ipprotocol: inet
+    protocol: TCP
+    source_net: alias_nw_opt4
+    destination_net: alias_nw_inet
+    destination_port: any
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 104
+
+  - description: allow VIP connection from opt2
+    categories: red
+    action: pass
+    interface: opt2
+    direction: in
+    ipprotocol: inet
+    protocol: TCP
+    source_net: 192.168.42.0/24
+    destination_net: 192.168.13.0/24
+    destination_port: 9999
+    enabled: 1
+    quick: 1
+    statetype: keep
+    sequence: 200
+
+
+

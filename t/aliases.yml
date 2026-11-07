@@ -1,0 +1,59 @@
+---
+aliases:
+  - name: alias_nw_inet
+    type: network
+    content: 172.16.99.0/24
+    enabled: 1
+    categories: red
+    description: Alias of INET Network
+
+  - name: alias_nw_opt1
+    type: network
+    content: 172.16.1.0/24
+    enabled: 1
+    categories: red
+    description: Alias of OPT1 Network
+  
+  - name: alias_nw_opt2
+    type: network
+    content: 172.16.2.0/24
+    enabled: 1
+    categories: red
+    description: Alias of OPT2 Network
+  
+  - name: alias_nw_opt3
+    type: network
+    content: 172.16.3.0/24
+    enabled: 1
+    categories: red
+    description: Alias of OPT3 etwork
+  
+  - name: alias_nw_opt4
+    type: network
+    content: 172.16.4.0/24
+    enabled: 1
+    categories: red
+    description: Alias of OPT4 etwork
+
+  - name: alias_nw_192_168_1_0__24
+    type: network
+    content: 192.168.1.0/24
+    enabled: 1
+    categories: red
+    description: Alias of Network
+
+  - name: host_ldapserver
+    type: host
+    content: 192.168.1.72
+    enabled: 1
+    categories: green
+    description: Alias of LDAP Server
+
+
+  - name: port_1234
+    type: port
+    content: 1234
+    enabled: 1
+    categories: blue
+    description: Alias of port 1234
+
