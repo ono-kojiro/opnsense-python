@@ -75,7 +75,7 @@ EOS
 
   mkdir -p $DESTDIR/usr/bin/
 
-  cat - << EOF > $DESTDIR/usr/bin/opncli
+  cat - << EOF > opncli
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import re
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     sys.exit(main())
 EOF
 
-  chmod 755 $DESTDIR/usr/bin/
+  command install -m 755 opncli $DESTDIR/usr/bin/opncli
   fakeroot dpkg-deb --build $DESTDIR $OUTPUTDIR
   echo "done"
 }
