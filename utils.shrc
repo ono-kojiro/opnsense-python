@@ -1,0 +1,147 @@
+#!/bin/sh
+
+PKGNAME=`tomlq -r '.project.name' pyproject.toml`
+PKGVER=`tomlq -r '.project.version' pyproject.toml`
+
+ARCH=all
+OUTPUTDIR=.
+WHLPKGNAME=`echo $PKGNAME | tr '-' '_'`
+package_whl="dist/${WHLPKGNAME}-${PKGVER}-py3-none-any.whl"
+package_deb="${PKGNAME}_${PKGVER}_${ARCH}.deb"
+
+help()
+{
+  usage
+}
+
+usage()
+{
+  cat << EOS
+usage : $0 [options] target1 target2 ...
+
+  target:
+    build
+    pytest
+EOS
+
+}
+
+all()
+{
+  :
+}
+
+prepare()
+{
+  python3 -m pip install -e .
+  python3 -m pip install .[dev]
+}
+
+build()
+{
+  wheel 
+  deb
+}
+
+pytest()
+{
+  command pytest ${flags}
+}
+
+
+wheel()
+{
+  python3 -m build
+}
+
+deb()
+{
+  extract_wheel
+
+  echo -n "create package ... "
+  echo ""
+  maintainer=`git config --get user.name`
+  email=`git config --get user.email`
+
+  mkdir -p $DESTDIR/DEBIAN
+  cat << EOS > $DESTDIR/DEBIAN/control
+Package: $PKGNAME
+Maintainer: $maintainer <$email>
+Architecture: $ARCH
+Version: $PKGVER
+Depends: python3, python3-dotenv, python3-requests, python3-yaml
+Description: $PKGNAME
+EOS
+
+  mkdir -p $DESTDIR/usr/bin/
+
+  cat - << EOF > $DESTDIR/usr/bin/opncli
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import re
+import sys
+from opnsense.opncli import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
+EOF
+
+  chmod 755 $DESTDIR/usr/bin/
+  fakeroot dpkg-deb --build $DESTDIR $OUTPUTDIR
+  echo "done"
+}
+
+install()
+{
+  cp -f ${package_deb} /tmp/
+  sudo apt -y install /tmp/${package_deb}
+  rm -f /tmp/${package_deb}
+}
+
+uninstall()
+{
+  sudo apt -y remove --purge ${PKGNAME}
+}
+
+reinstall()
+{
+  uninstall
+  install
+}
+
+test()
+{
+  command pytest -s
+}
+
+extract_wheel()
+{
+  rm -rf work/dest/
+  DESTDIR="work/dest/${PKGNAME}-${PKGVER}"
+  dist_packages="$DESTDIR/usr/lib/python3/dist-packages"
+  mkdir -p $dist_packages
+
+  unzip $package_whl -d $dist_packages/
+}
+
+control()
+{
+  set -a
+  export maintainer=`git config --get user.name`
+  export email=`git config --get user.email`
+
+  export PKGNAME=${PKGNAME}
+  export PKGVER=${PKGVER}
+  cat control.in \
+      | envsubst '${PKGNAME} ${maintainer} ${email} ${PKGVER}' \
+      > debian/control
+  set +a
+}
+
+package()
+{
+  dpkg-buildpackage -us -uc
+}
+
+
