@@ -106,8 +106,28 @@ class FilterAPI:
         Delete a firewall rule by UUID.
         POST /api/firewall/filter/del_rule/<uuid>
         """
-        uuid = params['uuid']
+        res = self.get(None, None)
+        items = res['filter']['rules']['rule']
+        descr2uuid = {}
+        for uuid in items:
+            item = items[uuid]
+            descr = item.get('description')
+            descr2uuid[descr] = uuid
+
+        uuid  = params.get('uuid', None)
+        descr = params.get('descr', None)
+
+        if not uuid and not descr :
+            logger.error('no uuid/descr parameter')
+            sys.exit(1)
+
+        if not uuid :
+            uuid = descr2uuid.get(descr, None)
+
         return self.client.post(f"{self.base}/del_rule/{uuid}")
+
+    def delete(self, data=None, params=None):
+        return self.del_rule(data, params)
 
     def toggle_rule(self, data=None, params=None):
         """

@@ -51,7 +51,6 @@ required_argument = 1
 optional_argument = 2
 
 def setup_logging(logfile, debug):
-
     fmt = logging.Formatter(
         "%(asctime)s %(levelname)s %(name)s: %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S%z",
@@ -59,12 +58,9 @@ def setup_logging(logfile, debug):
 
     if logfile :
         # FileHandler
-        handler = logging.FileHandler(
-            logfile,
-            mode='w',
-        )
+        handler = logging.FileHandler(logfile, mode='w')
     else :
-        handler = logging.StreamHandler(sys.stdout)
+        handler = logging.StreamHandler(sys.stderr)
 
     handler.setFormatter(fmt)
 
