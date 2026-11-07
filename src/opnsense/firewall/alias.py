@@ -69,7 +69,7 @@ class AliasAPI:
         elif 'uuid' in params :
             uuid = params.get('uuid')
 
-        if not uuid :
+        if not uuid and not name:
             logger.error("no uuid/name parameter")
             sys.exit(1)
 
