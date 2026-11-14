@@ -1,6 +1,6 @@
 [project]
 name = "opnsense-python"
-version = "0.0.4"
+version = "0.0.5"
 description = "opensense-python package"
 authors = [
   { name = "Kojiro ONO", email = "ono.kojiro@gmail.com" }

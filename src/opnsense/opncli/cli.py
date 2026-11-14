@@ -268,6 +268,7 @@ def main() :
     model_map = {
         'filter' : 'rule',
         'vip_settings' : 'vip',
+        'assignment' : 'interface',
     }
 
     root_key = model_map.get(controller, controller)
