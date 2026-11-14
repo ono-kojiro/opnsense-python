@@ -25,7 +25,7 @@ class AssignmentAPI:
             logger.error('no ifnames parameter')
             sys.exit(1)
 
-        return self.client.post(f"{self.base}/del_item/{ifnames}")
+        return self.client.post(f"{self.base}/del_item/{ifnames}", json=data)
 
     def get(self, data, params):
         return self.client.get(f"{self.base}/get")
@@ -55,5 +55,5 @@ class AssignmentAPI:
         if not ifname :
             logger.error('no ifname parameter')
             sys.exit(1)
-        return self.client.post(f"{self.base}/set_item/{ifname}")
+        return self.client.post(f"{self.base}/set_item/{ifname}", json=data)
 
