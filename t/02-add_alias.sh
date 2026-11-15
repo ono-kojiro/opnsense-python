@@ -21,9 +21,9 @@ cat aliases.yml | yq -c '.aliases[]' |
             enabled="$enabled" \
             description="$description" > result.json
         if [ "$?" -eq 0 ]; then
-            echo "ok - opncli passed"
+            echo "ok - opncli passed, $name"
         else
-            echo "not ok - opncli failed"
+            echo "not ok - opncli failed, $name"
         fi
 
         res=`cat result.json | jq -r ".result"`
@@ -31,6 +31,9 @@ cat aliases.yml | yq -c '.aliases[]' |
             echo "ok - $res"
         else
             echo "not ok - $res"
+			echo "<<<<<<<<<<<"
+			cat result.json
+			echo ">>>>>>>>>>>"
         fi
     done
 
