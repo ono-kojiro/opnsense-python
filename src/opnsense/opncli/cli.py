@@ -88,8 +88,8 @@ def main() :
     #loglevel = 'debug'
     show_help = False
     show_longhelp = False
-    apikey_conf = None
-    config_conf = None
+    apikey_shrc = None
+    config_shrc = None
 
     args = []
     payload = {}
@@ -137,6 +137,9 @@ def main() :
     debug = opts.get('debug', False)
     logfile = opts.get('logfile', None)
 
+    apikey_shrc = opts.get('apikey', None)
+    config_shrc = opts.get('config', None)
+    
     # DEFAULT  level:name:message
     #fmt = '%(levelname)s:%(name)s:%(message)s'
     setup_logging(logfile, debug)
@@ -146,10 +149,11 @@ def main() :
     config_list.append(       './config.shrc')
     config_list.append(       './apikey.shrc')
     config_list.append(home + '/.opnsense/config.shrc')
-    if apikey_conf:
-        config_list.append(apikey_conf)
-    if config_conf :
-        config_list.append(config_conf)
+    config_list.append(home + '/.opnsense/apikey.shrc')
+    if apikey_shrc:
+        config_list.append(apikey_shrc)
+    if config_shrc :
+        config_list.append(config_shrc)
 
     for filepath in config_list:
         logger.debug('config_list: {0}'.format(filepath))
@@ -271,7 +275,25 @@ def main() :
         'assignment' : 'interface',
     }
 
-    root_key = model_map.get(controller, controller)
+    model_maps = {
+        'firewall' : {
+            'filter': 'rule',
+        },
+        'interfaces' : {
+            'vip_settings' : 'vip',
+            'assignment':    'interface',
+        },
+        'routing' : {
+            'settings' : 'gateway',
+        },
+    }
+
+    root_key = controller
+    if model_maps.get(module, None) :
+        if model_maps.get(module).get(controller, None) :
+            root_key = model_maps.get(module).get(controller)
+
+    #root_key = model_map.get(controller, controller)
     data = {
         root_key: payload,
     }

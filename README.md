@@ -38,6 +38,10 @@ $ opncli core system status
 ```
 $ opncli interfaces assignment get
 $ opncli interfaces assignment search_item
+
+$ opncli interfaces assignment add_item if=vtnet1 ifname=wan descr=WAN
+$ opncli interfaces assignment set_item --ifname=opt3 lock=0
+$ opncli interfaces assignment del_item --ifnames=opt3
 ```
 
 ### interfaces::vip_settings

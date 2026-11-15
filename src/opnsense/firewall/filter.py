@@ -26,12 +26,15 @@ class FilterAPI:
     # ───────────────────────────────────────────────
     #
 
-    def get(self, data=None, params=None):
+    def get_rule(self, data=None, params=None):
         """
         Get all firewall filter rules.
-        GET /api/firewall/filter/get
+        GET /api/firewall/filter/get_rule
         """
-        return self.client.get(f"{self.base}/get")
+        url = f"{self.base}/get_rule"
+        logger.info('call get in filter.py')
+        logger.info(url)
+        return self.client.get(url)
 
     def search_rule(self, data=None, params=None):
         """
@@ -106,11 +109,10 @@ class FilterAPI:
         Delete a firewall rule by UUID.
         POST /api/firewall/filter/del_rule/<uuid>
         """
-        res = self.get(None, None)
-        items = res['filter']['rules']['rule']
+        res = self.search_rule(None, None)
         descr2uuid = {}
-        for uuid in items:
-            item = items[uuid]
+        for item in res['rows'] :
+            uuid = item.get('uuid')
             descr = item.get('description')
             descr2uuid[descr] = uuid
 
