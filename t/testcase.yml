@@ -1,0 +1,27 @@
+---
+testcases:
+  - dstterm: wanterm
+    dstcmd: "nc -k -l 9901"
+    srcterm: opt1term
+    srccmd: "nc -z 172.16.0.42 9901"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: wanterm
+    dstcmd: "nc -k -l 9902"
+    srcterm: opt2term
+    srccmd: "nc -z 172.16.0.42 9902"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: wanterm
+    dstcmd: "nc -k -l 9903"
+    srcterm: opt3term
+    srccmd: "nc -z 172.16.0.42 9903"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: wanterm
+    dstcmd: "nc -k -l 9904"
+    srcterm: opt4term
+    srccmd: "nc -z 172.16.0.42 9904"
+    dstkillcmd: "pkill nc"
+
+
