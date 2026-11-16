@@ -154,13 +154,12 @@ prove()
 prove_pre()
 {
   cd t
+
   command prove $flags \
 	01-add_category.sh \
 	02-add_alias.sh \
 	03-add_vip.sh \
-	04-add_filter.sh \
-	05-add_network.sh \
-	06-add_container.sh
+	04-add_filter.sh
 
   cd $top_dir
 }
@@ -168,6 +167,7 @@ prove_pre()
 prove_main()
 {
   cd t
+
   command prove $flags \
 	20-test_nc.sh
 
@@ -178,9 +178,8 @@ prove_main()
 prove_post()
 {
   cd t
+
   command prove $flags \
-	94-delete_container.sh \
-	95-delete_network.sh \
 	96-delete_filter.sh \
 	97-delete_vip.sh \
 	98-delete_alias.sh \

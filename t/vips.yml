@@ -1,8 +1,8 @@
 ---
 vips:
-  - descr: vip_wan_192_168_13_40__24
+  - descr: vip_wan_192_168_40_99__24
     interface: wan
-    network: 192.168.13.40/24
+    network: 192.168.40.99/24
   
   - descr: vip_opt1_192_168_41_1__24
     interface: opt1

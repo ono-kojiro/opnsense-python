@@ -35,31 +35,31 @@ aliases:
   enabled: 1
   categories: red
   description: Alias of Network
-- name: host_ldapserver
+- name: alias_host_ldapserver
   type: host
   content: 192.168.1.72
   enabled: 1
   categories: red
   description: Alias of LDAP Server
-- name: net_192_168_42_0_24
+- name: alias_net_192_168_42_0_24
   type: network
   content: 192.168.42.0/24
   enabled: 1
   categories: red
   description: 'Alias of NW 192.168.42.0/24'
-- name: net_192_168_13_0_24
+- name: alias_net_192_168_13_0_24
   type: network
   content: 192.168.13.0/24
   enabled: 1
   categories: red
   description: 'Alias of NW 192.168.13.0/24'
-- name: port_1234
+- name: alias_port_1234
   type: port
   content: '1234'
   enabled: 1
   categories: red
   description: Alias of port 1234
-- name: port_9999
+- name: alias_port_9999
   type: port
   content: '9999'
   enabled: 1
