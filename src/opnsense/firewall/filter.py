@@ -96,11 +96,34 @@ class FilterAPI:
     def set_rule(self, data=None, params=None):
         """
         Update an existing firewall rule.
-        POST /api/firewall/filter/setRule/<uuid>
+        POST /api/firewall/filter/set_rule/<uuid>
         """
-        uuid = params['uuid']
+        uuid = None
+        descr2uuid = {}
+
+        res = self.search_rule()
+        rows = res['rows']
+        for row in rows:
+            descr = row.get('description', '')
+            uuid  = row.get('uuid', '')
+            if descr != '' :
+                descr2uuid[descr] = uuid
+
+        descr = params.get('descr', None)
+        if descr :
+            uuid = descr2uuid.get(descr, None)
+
+        if not uuid :
+            uuid = params.get('uuid', None)
+
+        if not uuid :
+            logger.error('no uuid found from descr/uuid params')
+            logger.debug(data)
+            logger.debug(param)
+            sys.exit(1)
+
         return self.client.post(
-                  f"{self.base}/setRule/{uuid}",
+                  f"{self.base}/set_rule/{uuid}",
                   json=data
                )
 

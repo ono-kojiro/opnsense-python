@@ -123,6 +123,14 @@ $ opncli firewall filter add_rule \
 $ opncli firewall filter apply
 ```
 
+### firewall::filter::set_rule
+
+```
+$ opncli firewall filter set_rule enabled=0 --uuid=xxxxxxx
+$ opncli firewall filter set_rule enabled=1 --descr="allow PING"
+$ opncli firewall filter apply
+```
+
 ## Core::Firmware
 
 ```
