@@ -123,6 +123,13 @@ $ opncli firewall filter add_rule \
 $ opncli firewall filter apply
 ```
 
+### firewall::filter::get_rule
+
+```
+$ opncli firewall filter get_rule --descr="allow PING" \
+    | jq -r ".rule.description"
+```
+
 ### firewall::filter::set_rule
 
 ```

@@ -31,9 +31,33 @@ class FilterAPI:
         Get all firewall filter rules.
         GET /api/firewall/filter/get_rule
         """
-        url = f"{self.base}/get_rule"
-        logger.info('call get in filter.py')
-        logger.info(url)
+        uuid = None
+
+        descr2uuid = {}
+
+        res = self.search_rule()
+        rows = res['rows']
+        for row in rows:
+            descr = row.get('description', '')
+            uuid  = row.get('uuid', '')
+            if descr != '' :
+                descr2uuid[descr] = uuid
+
+        descr = params.get('descr', None)
+        if descr :
+            uuid = descr2uuid.get(descr, None)
+
+        if not uuid :
+            uuid = params.get('uuid', None)
+
+        if not uuid :
+            logger.error('no uuid found from descr/uuid params')
+            logger.debug(data)
+            logger.debug(param)
+            sys.exit(1)
+
+        url = f"{self.base}/get_rule/{uuid}"
+        logger.debug(url)
         return self.client.get(url)
 
     def search_rule(self, data=None, params=None):
