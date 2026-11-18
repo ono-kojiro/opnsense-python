@@ -146,8 +146,46 @@ package()
 
 prove()
 {
-  cd t
-  command prove -v *.sh
-  cd ..
+  prove_pre
+  prove_main
+  prove_post
 }
+
+prove_pre()
+{
+  cd t
+
+  command prove $flags \
+	01-add_category.sh \
+	02-add_alias.sh \
+	03-add_vip.sh \
+	04-add_filter.sh
+
+  cd $top_dir
+}
+
+prove_main()
+{
+  cd t
+
+  command prove $flags \
+	20-test_nc.sh
+
+  cd $top_dir
+}
+
+
+prove_post()
+{
+  cd t
+
+  command prove $flags \
+	96-delete_filter.sh \
+	97-delete_vip.sh \
+	98-delete_alias.sh \
+	99-delete_category.sh
+
+  cd $top_dir
+}
+
 

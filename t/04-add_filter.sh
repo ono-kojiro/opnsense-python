@@ -41,8 +41,8 @@ cat filters.yml | yq -c '.filters[]' |
         cmd="$cmd quick=\"$quick\""
         cmd="$cmd statetype=\"$statetype\""
         cmd="$cmd sequence=\"$sequence\""
-        echo $cmd 1>&2
-        eval "$cmd" > result.json
+        
+		eval "$cmd" > result.json
 
         if [ "$?" -eq 0 ]; then
             echo "ok - opncli passed"

@@ -1,0 +1,27 @@
+---
+testcases:
+  - dstterm: server
+    dstcmd: "nc -k -l 9901"
+    srcterm: client1
+    srccmd: "nc -z 172.16.0.42 9901"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: server
+    dstcmd: "nc -k -l 9902"
+    srcterm: client2
+    srccmd: "nc -z 172.16.0.42 9902"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: server
+    dstcmd: "nc -k -l 9903"
+    srcterm: client3
+    srccmd: "nc -z 172.16.0.42 9903"
+    dstkillcmd: "pkill nc"
+  
+  - dstterm: server
+    dstcmd: "nc -k -l 9904"
+    srcterm: client4
+    srccmd: "nc -z 172.16.0.42 9904"
+    dstkillcmd: "pkill nc"
+
+
