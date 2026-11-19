@@ -10,7 +10,7 @@ from opnsense.client import OPNsenseClient
 
 logger = logging.getLogger(__name__)
 
-class NetSnmpUserAPI:
+class UserAPI:
     """
     OPNsense NetSNMP User API
     module: netsnmp
@@ -19,6 +19,7 @@ class NetSnmpUserAPI:
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
+        self.base   = "/api/netsnmp/user"
 
     def __add_user(self, mod, ctl, cmd):
         print('  options:')
@@ -52,7 +53,7 @@ class NetSnmpUserAPI:
         if ret :
             sys.exit(1)
 
-        return self.client.post("/api/netsnmp/user/add_user", json=data)
+        return self.client.post(f"{self.base}/add_user", json=data)
     
     def del_user(self, data=None, params=None):
         """
@@ -62,52 +63,52 @@ class NetSnmpUserAPI:
             logger.error("param 'uuid' is not defined")
             sys.exit(2)
 
-        param = params['uuid']
-        url = "/api/netsnmp/user/del_user/{0}".format(param)
+        uuid = params['uuid']
+        url = f"{self.base}/del_user/{uuid}"
         return self.client.post(url)
     
-    def get(self, json=None, params=None):
+    def get(self):
         """
         GET /api/netsnmp/user/get
         """
-        url = "/api/netsnmp/user/get"
+        url = f"{self.base}/get"
         return self.client.get(url)
 
-    def get_user(self, data=None, params=None):
+    def get_user(self, data=None):
         """
         GET /api/netsnmp/user/get_user
         """
-        param = data['user']['uuid']
-        url = "/api/netsnmp/user/get_user/{0}".format(param)
+        uuid = data['user']['uuid']
+        url = f"{self.base}/get_user/{uuid}"
         return self.client.get(url)
     
-    def search_user(self, data=None, params=None):
+    def search_user(self):
         """
         GET /api/netsnmp/user/search_user
         """
-        url = "/api/netsnmp/user/search_user"
+        url = f"{self.base}/search_user"
         return self.client.get(url)
 
     def set(self, data=None, params=None):
         """
         GET /api/netsnmp/user/set
         """
-        url = "/api/netsnmp/user/set"
+        url = f"{self.base}/set"
         return self.client.post(url, json=data)
 
     def set_user(self, data=None, params=None):
         """
         GET /api/netsnmp/user/set_user
         """
-        param = data['user']['uuid']
-        url = "/api/netsnmp/user/set_user/{0}".format(param)
+        uuid = params['uuid']
+        url = f"{self.base}/set_user/{uuid}"
         return self.client.post(url, json=data)
 
-    def toggle_user(self, data=None, params=None):
+    def toggle_user(self, params):
         """
         GET /api/netsnmp/user/toggle_user
         """
-        param = data['user']['uuid']
-        url = "/api/netsnmp/user/toggle_user/{0}".format(param)
-        return self.client.post(url, json=data)
+        uuid = params['uuid']
+        url = f"{self.base}/toggle_user/{uuid}"
+        return self.client.post(url)
 
