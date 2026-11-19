@@ -201,6 +201,35 @@ def test_firewall_disable_enable_rules():
     data = json.loads(lines)
     assert data['total'] != 0
 
+    enabled = None
+    for item in data['rows'] :
+        if item['description'] == 'hoge':
+            enabled = item['enabled']
+   
+    assert enabled == '0'
+
+    cmd = 'opncli firewall filter set_rule --descr="hoge" enabled=1'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    assert data['result'] == 'saved'
+    
+    cmd = 'opncli firewall filter apply'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    assert data['status'] == 'OK\n\n'
+    
+    cmd = 'opncli firewall filter search_rule'
+    lines = run_shell(cmd)
+    data = json.loads(lines)
+    assert data['total'] != 0
+
+    enabled = None
+    for item in data['rows'] :
+        if item['description'] == 'hoge':
+            enabled = item['enabled']
+   
+    assert enabled == '1'
+
 def test_firewall_clean_rules():
     uuids = []
     cmd = 'opncli firewall filter search_rule | jq -r ".rows[] | select(.\\"%categories\\" == \\"admin\\") | .uuid"'
