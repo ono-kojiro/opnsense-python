@@ -16,19 +16,19 @@ class CategoryAPI:
         self.client = client
         self.base   = "/api/firewall/category"
 
-    def get(self, json=None, params=None):
+    def get(self):
         """
         Get categories.
         GET /api/firewall/category/get
         """
         return self.client.get("{0}/get".format(self.base))
 
-    def search_item(self, json=None, params=None):
+    def search_item(self, data=None, params=None):
         """
         Search categories.
         POST /api/firewall/category/search_item
         """
-        return self.client.post("{0}/search_item".format(self.base), json=json)
+        return self.client.post("{0}/search_item".format(self.base), json=data)
 
     def __add_item(self, mod, ctl, cmd) :
         msg = '''
@@ -37,21 +37,21 @@ class CategoryAPI:
 '''
         print(msg)
 
-    def add_item(self, json=None, params=None):
+    def add_item(self, data=None, params=None):
         """
         Add category.
         POST /api/firewall/category/add_item
         """
-        logger.debug(json)
-        return self.client.post("{0}/add_item".format(self.base), json=json)
+        logger.debug(data)
+        return self.client.post("{0}/add_item".format(self.base), json=data)
 
     def __add(self, mod, ctl, cmd):
         return self.__add_item(mod, ctl, cmd)
 
-    def add(self, json=None, params=None):
-        return self.add_item(json, params)
+    def add(self, data=None, params=None):
+        return self.add_item(data, params)
 
-    def set(self, json=None, params=None):
+    def set(self, data=None, params=None):
         """
         Update category.
         POST /api/firewall/category/setCategory/<uuid>
@@ -61,9 +61,9 @@ class CategoryAPI:
             sys.exit(1)
 
         uuid = params['uuid']
-        return self.client.post("{0}/set/{1}".format(self.base, uuid), json=json)
+        return self.client.post("{0}/set/{1}".format(self.base, uuid), json=data)
 
-    def del_item(self, json=None, params=None):
+    def del_item(self, data=None, params=None):
         """
         Delete category.
         POST /api/firewall/category/del_item/<uuid>
@@ -85,7 +85,7 @@ class CategoryAPI:
 
         return self.client.post("{0}/del_item/{1}".format(self.base, uuid))
 
-    def apply(self, json=None, params=None):
+    def apply(self):
         """
         Apply category changes.
         POST /api/firewall/category/apply

@@ -5,7 +5,7 @@ import sys
 import getopt
 
 from opnsense.client import OPNsenseClient
-from opnsense.interfaces.vip_settings import VipSettingsAPI
+from opnsense.api.interfaces.vip_settings import VipSettingsAPI
 
 from pprint import pprint
 

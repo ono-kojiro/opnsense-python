@@ -7,17 +7,17 @@ from dotenv import load_dotenv
 
 from opnsense.client import OPNsenseClient
 
-from opnsense.auth.group import AuthGroupAPI
+from opnsense.api.auth.group import AuthGroupAPI
 
-from opnsense.captiveportal.access  import CaptiveportalAccessAPI
-from opnsense.captiveportal.service import CaptiveportalServiceAPI
+from opnsense.api.captiveportal.access  import CaptiveportalAccessAPI
+from opnsense.api.captiveportal.service import CaptiveportalServiceAPI
 
-from opnsense.core.system import CoreSystemAPI
-from opnsense.core.menu   import CoreMenuAPI
+from opnsense.api.core.system import SystemAPI
+from opnsense.api.core.menu   import CoreMenuAPI
 
-from opnsense.firewall import FirewallAPI
+from opnsense.api.firewall import FirewallAPI
 
-from opnsense.interfaces.settings import InterfacesSettingsAPI
+from opnsense.api.interfaces.settings import InterfacesSettingsAPI
 
 # プロジェクトルートの .env を読み込む
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "apikey.shrc"))
@@ -74,7 +74,7 @@ def captiveportal_service_api(opnsense_client):
 #
 @pytest.fixture
 def core_system_api(opnsense_client):
-    return CoreSystemAPI(opnsense_client)
+    return SystemAPI(opnsense_client)
 
 @pytest.fixture
 def core_menu_api(opnsense_client):

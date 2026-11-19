@@ -25,10 +25,10 @@ PACKAGE_ROOT = pathlib.Path(opnsense.__file__).parent
 #from opnsense.interfaces import InterfacesAPI
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall import FirewallAPI
+from opnsense.api.firewall import FirewallAPI
 #from opnsense.interfaces import InterfacesAPI
-from opnsense.interfaces.vip_settings import VipSettingsAPI
-from opnsense.firewall.category import CategoryAPI
+from opnsense.api.interfaces.vip_settings import VipSettingsAPI
+from opnsense.api.firewall.category import CategoryAPI
 
 from opnsense.utils.vip import vip_add, vip_clean, vip_list
 from opnsense.utils.rule import rule_add, rule_clean, rule_list
@@ -43,6 +43,9 @@ logger = logging.getLogger(__name__)
 from opnsense.utils.optparser import *
 
 from .usage import *
+
+from .discovery import *
+from .reflection import *
 
 from pprint import pprint
 
@@ -329,7 +332,22 @@ def main() :
         usage_controller(module, controller, path2cls)
         sys.exit(1)
 
-    res = method(data, params)
+    sig = inspect.signature(method)
+    kwargs = {}
+
+    for name in sig.parameters:
+        if name == 'data':
+            kwargs[name] = data
+
+        elif name == 'params':
+            kwargs[name] = params
+
+        elif name in params:
+            kwargs[name] = params[name]
+
+    logger.debug(kwargs)
+
+    res = method(**kwargs)
     if res :
         fp.write(json.dumps(res, indent=4))
         fp.write('\n')

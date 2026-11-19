@@ -5,8 +5,8 @@ import sys
 import getopt
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall.filter import FilterAPI
-from opnsense.firewall.category import CategoryAPI
+from opnsense.api.firewall.filter import FilterAPI
+from opnsense.api.firewall.category import CategoryAPI
 
 from opnsense.utils.category import category_list
 

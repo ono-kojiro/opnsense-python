@@ -5,7 +5,7 @@ import sys
 import getopt
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall.category import CategoryAPI 
+from opnsense.api.firewall.category import CategoryAPI 
 
 from pprint import pprint
 

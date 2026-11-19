@@ -9,7 +9,7 @@ import re
 import json
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall import FirewallAPI
+from opnsense.api.firewall import FirewallAPI
 
 from pprint import pprint
 

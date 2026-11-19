@@ -1,7 +1,7 @@
 from opnsense.client import OPNsenseClient
 
 
-class CoreSystemAPI:
+class SystemAPI:
     """
     OPNsense Core System API
     module: core
@@ -11,8 +11,9 @@ class CoreSystemAPI:
 
     def __init__(self, client: OPNsenseClient):
         self.client = client
+        self.base = "/api/core/system"
 
-    def status(self, data=None, params=None):
+    def status(self):
         """
         Get system status
         GET /api/core/system/status

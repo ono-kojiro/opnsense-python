@@ -4,7 +4,7 @@ import re
 import textwrap
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall.category import CategoryAPI
+from .category import CategoryAPI
 
 import logging
 logger = logging.getLogger(__name__)

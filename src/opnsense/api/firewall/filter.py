@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from opnsense.client import OPNsenseClient
-from opnsense.firewall.category import CategoryAPI
+from opnsense.api.firewall.category import CategoryAPI
 
 class FilterAPI:
     """
@@ -143,7 +143,7 @@ class FilterAPI:
         if not uuid :
             logger.error('no uuid found from descr/uuid params')
             logger.debug(data)
-            logger.debug(param)
+            logger.debug(params)
             sys.exit(1)
 
         return self.client.post(
