@@ -13,7 +13,7 @@ from opnsense.opncli.discovery import (
 
 from opnsense.opncli.reflection import (
     get_module_object,
-    get_api_class,
+    get_controller_class,
     create_instance,
     get_class_methods,
     get_class_method,
@@ -195,7 +195,7 @@ def usage_controller(
 
     mod_obj = get_module_object(modulepath)
 
-    class_obj = get_api_class(mod_obj)
+    class_obj = get_controller_class(mod_obj)
 
     instance = create_instance(
         class_obj,
@@ -238,7 +238,7 @@ def usage_command(
 
     mod_obj = get_module_object(modulepath)
 
-    class_obj = get_api_class(mod_obj)
+    class_obj = get_controller_class(mod_obj)
 
     instance = create_instance(
         class_obj,

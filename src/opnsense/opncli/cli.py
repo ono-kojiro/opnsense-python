@@ -318,7 +318,7 @@ def main() :
     logger.debug(mod_obj)
     
     # get class object
-    class_obj = get_class_object(mod_obj, api_class_name)
+    class_obj = get_controller_class(mod_obj)
     logger.debug(class_obj)
 
     # create instance
@@ -326,6 +326,28 @@ def main() :
 
     # get method
     method = get_class_method(instance, command)
+
+    logger.debug(
+        "instance class = %s",
+        instance.__class__.__module__
+    )
+
+    logger.debug(
+        "instance name = %s",
+        instance.__class__.__name__
+    )
+
+    logger.debug(
+        "command = [%s]",
+        command
+    )
+
+    logger.debug(
+        "methods = %s",
+        get_class_methods(instance)
+    )
+
+
     if not method :
         msg = "controller '{0}' DOES NOT have such command, '{1}'".format(controller, command)
         logger.error(msg)
