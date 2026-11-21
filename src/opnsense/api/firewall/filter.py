@@ -1,18 +1,18 @@
-import sys
-import re
-
-import logging
-logger = logging.getLogger(__name__)
+# src/opnsense/api/firewall/filter.py
 
 from opnsense.client import OPNsenseClient
-from opnsense.api.firewall.category import CategoryAPI
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class FilterAPI:
     """
     OPNsense Firewall Filter API
+
     module: firewall
     controller: filter
-    commands: get, add_rule, del_rule, toggleRule, search_rule, setRule, etc.
     """
 
     def __init__(self, client: OPNsenseClient):
@@ -20,220 +20,146 @@ class FilterAPI:
         self.base = "/api/firewall/filter"
 
     #
-    # ───────────────────────────────────────────────
-    # 基本コマンド（公式ドキュメント準拠）
-    # https://docs.opnsense.org/development/api/core/firewall.html
-    # ───────────────────────────────────────────────
+    # Basic operations
     #
 
-    def get_rule(self, data=None, params=None):
+    def get_rule(self, params):
         """
-        Get all firewall filter rules.
-        GET /api/firewall/filter/get_rule
+        GET /api/firewall/filter/get_rule/<uuid>
         """
-        uuid = None
 
-        descr2uuid = {}
-
-        res = self.search_rule()
-        rows = res['rows']
-        for row in rows:
-            descr = row.get('description', '')
-            uuid  = row.get('uuid', '')
-            if descr != '' :
-                descr2uuid[descr] = uuid
-
-        descr = params.get('descr', None)
-        if descr :
-            uuid = descr2uuid.get(descr, None)
-
-        if not uuid :
-            uuid = params.get('uuid', None)
-
-        if not uuid :
-            logger.error('no uuid found from descr/uuid params')
-            logger.debug(data)
-            logger.debug(param)
-            sys.exit(1)
+        uuid = params["uuid"]
 
         url = f"{self.base}/get_rule/{uuid}"
-        logger.debug(url)
+
         return self.client.get(url)
 
-    def search_rule(self, data=None, params=None):
+    def search_rule(self, data=None):
         """
-        Search firewall rules.
-        POST /api/firewall/filter/searc_rule
+        POST /api/firewall/filter/search_rule
         """
+
+        url = f"{self.base}/search_rule"
+
         return self.client.post(
-            f"{self.base}/search_rule",
+            url,
             json=data
         )
 
-    def add_rule(self, data=None, params=None):
+    def add_rule(self, data):
         """
-        Add a new firewall rule.
         POST /api/firewall/filter/add_rule
         """
-        logging.debug(data)
-        if not 'description' in data['rule'] :
-            logger.error('no description for rule')
-            sys.exit(1)
 
-        category_api = CategoryAPI(self.client)
-        res = category_api.get()
-        cat_uuids = res['category']['categories']['category']
-        cat2uuid = {}
-        for uuid in cat_uuids:
-            name = cat_uuids[uuid]['name']
-            cat2uuid[name] = uuid
-
-        ret = 0
-        values = ''
-        if 'categories' in data['rule'] :
-            tokens = re.split(r',', data['rule']['categories'])
-            for token in tokens:
-                uuid = cat2uuid.get(token, None)
-                if uuid is None :
-                    logger.error('no such category, "{0}"'.format(token))
-                    ret = ret + 1
-                else :
-                    values = values + ',' + uuid
-        if ret :
-            sys.exit(1)
-
-        descr = data['rule']['description']
-
-        res = self.search_rule()
-        rows = res['rows']
-        for row in rows:
-            if row['description'] == descr :
-                logger.error('same description, uid={0}'.format(row['uuid']))
-                logger.debug(row)
-                sys.exit(1)
-
-        values = re.sub(r'^,', '', values)
-        data['rule']['categories'] = values
-
-        return self.client.post(f"{self.base}/add_rule", json=data)
-
-    def set_rule(self, data=None, params=None):
-        """
-        Update an existing firewall rule.
-        POST /api/firewall/filter/set_rule/<uuid>
-        """
-        uuid = None
-        descr2uuid = {}
-
-        res = self.search_rule()
-        rows = res['rows']
-        for row in rows:
-            descr = row.get('description', '')
-            uuid  = row.get('uuid', '')
-            if descr != '' :
-                descr2uuid[descr] = uuid
-
-        descr = params.get('descr', None)
-        if descr :
-            uuid = descr2uuid.get(descr, None)
-
-        if not uuid :
-            uuid = params.get('uuid', None)
-
-        if not uuid :
-            logger.error('no uuid found from descr/uuid params')
-            logger.debug(data)
-            logger.debug(params)
-            sys.exit(1)
+        url = f"{self.base}/add_rule"
 
         return self.client.post(
-                  f"{self.base}/set_rule/{uuid}",
-                  json=data
-               )
+            url,
+            json=data
+        )
 
-    def del_rule(self, data=None, params=None):
+    def set_rule(self, data, params):
         """
-        Delete a firewall rule by UUID.
+        POST /api/firewall/filter/set_rule/<uuid>
+        """
+
+        uuid = params["uuid"]
+
+        url = f"{self.base}/set_rule/{uuid}"
+
+        return self.client.post(
+            url,
+            json=data
+        )
+
+    def del_rule(self, params):
+        """
         POST /api/firewall/filter/del_rule/<uuid>
         """
-        res = self.search_rule(None, None)
-        descr2uuid = {}
-        for item in res['rows'] :
-            uuid = item.get('uuid')
-            descr = item.get('description')
-            descr2uuid[descr] = uuid
 
-        uuid  = params.get('uuid', None)
-        descr = params.get('descr', None)
+        uuid = params["uuid"]
 
-        if not uuid and not descr :
-            logger.error('no uuid/descr parameter')
-            sys.exit(1)
+        url = f"{self.base}/del_rule/{uuid}"
 
-        if not uuid :
-            uuid = descr2uuid.get(descr, None)
+        return self.client.post(url)
 
-        return self.client.post(f"{self.base}/del_rule/{uuid}")
-
-    def delete(self, data=None, params=None):
-        return self.del_rule(data, params)
-
-    def toggle_rule(self, data=None, params=None):
+    def toggle_rule(self, params):
         """
-        Enable/disable a firewall rule.
         POST /api/firewall/filter/toggleRule/<uuid>
         """
-        uuid = params['uuid']
-        return self.client.post(f"{self.base}/toggleRule/{uuid}")
+
+        uuid = params["uuid"]
+
+        url = f"{self.base}/toggleRule/{uuid}"
+
+        return self.client.post(url)
 
     #
-    # ───────────────────────────────────────────────
-    # apply コマンド（Firewall/NAT/Rules 共通）
-    # ───────────────────────────────────────────────
+    # Apply
     #
 
-    def apply(self, data=None, params=None):
+    def apply(self):
         """
-        Apply firewall changes.
         POST /api/firewall/filter/apply
         """
-        return self.client.post(f"{self.base}/apply")
+
+        url = f"{self.base}/apply"
+
+        return self.client.post(url)
 
     #
-    # ───────────────────────────────────────────────
-    # Utility: selected=0 の項目を再帰的に削除するフィルタ
-    # ───────────────────────────────────────────────
+    # Utility
     #
 
     @staticmethod
     def prune_selected(obj):
         """
-        Recursively remove items where selected == 0.
-        Useful for cleaning OPNsense API responses.
+        Recursively remove items where
+        selected == 0
         """
 
-        # selected を持つ辞書なら判定して返す
-        if isinstance(obj, dict) and "selected" in obj:
-            return obj if obj["selected"] == 1 else None
+        if (
+            isinstance(obj, dict)
+            and "selected" in obj
+        ):
+            return (
+                obj
+                if obj["selected"] == 1
+                else None
+            )
 
-        # 辞書なら再帰的に処理
         if isinstance(obj, dict):
+
             new_obj = {}
+
             for key, value in obj.items():
-                pruned = FilterAPI.prune_selected(value)
+
+                pruned = (
+                    FilterAPI.prune_selected(
+                        value
+                    )
+                )
+
                 if pruned is not None:
                     new_obj[key] = pruned
+
             return new_obj
 
-        # リストなら再帰的に処理
         if isinstance(obj, list):
+
             new_list = []
+
             for item in obj:
-                pruned = FilterAPI.prune_selected(item)
+
+                pruned = (
+                    FilterAPI.prune_selected(
+                        item
+                    )
+                )
+
                 if pruned is not None:
                     new_list.append(pruned)
+
             return new_list
 
-        # その他の型はそのまま返す
         return obj
-
