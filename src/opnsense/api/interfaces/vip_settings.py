@@ -1,14 +1,16 @@
-import sys
+# src/opnsense/api/interfaces/vip_settings.py
 
 import logging
-logger = logging.getLogger(__name__)
 
 from opnsense.client import OPNsenseClient
+
+logger = logging.getLogger(__name__)
 
 
 class VipSettingsAPI:
     """
     OPNsense Interfaces VIP Settings API
+
     module: interfaces
     controller: vip_settings
     """
@@ -17,58 +19,84 @@ class VipSettingsAPI:
         self.client = client
         self.base = "/api/interfaces/vip_settings"
 
-    def add_item(self, data: dict, params: dict):
-        return self.client.post(f"{self.base}/add_item", json=data)
-    
-    def add(self, data: dict, params: dict):
-        return self.add_item(data, params)
+    def add_item(self, data):
+        """
+        POST /api/interfaces/vip_settings/add_item
+        """
+        url = f"{self.base}/add_item"
 
-    def del_item(self, data: dict, params: dict):
-        res = self.get(data, params)
-        items = res['vip']['vip']
-        descr2uuid = {}
-        for uuid in items :
-            item = items[uuid]
-            descr = item.get('descr')
-            descr2uuid[descr] = uuid
+        return self.client.post(
+            url,
+            json=data,
+        )
 
-        uuid = params.get('uuid', None)
-        descr = params.get('descr', None)
-        if not uuid and not descr:
-            logging.error('no uuid/descr parameter')
-            sys.exit(1)
+    def del_item(self, params):
+        """
+        POST /api/interfaces/vip_settings/del_item/<uuid>
+        """
+        uuid = params["uuid"]
 
-        if descr :
-            uuid = descr2uuid[descr]
+        url = f"{self.base}/del_item/{uuid}"
 
-        return self.client.post(f"{self.base}/del_item/{uuid}")
-    
-    def delete(self, data: dict, params: dict):
-        return self.del_item(data, params)
+        return self.client.post(url)
 
-    def get(self, data: dict, params: dict):
-        return self.client.get(f"{self.base}/get")
+    def get(self):
+        """
+        GET /api/interfaces/vip_settings/get
+        """
+        url = f"{self.base}/get"
 
-    def get_item(self, data: dict, params: dict):
-        uuid = params.get('uuid', None)
-        if not uuid :
-            logging.error('no uuid parameter')
-            sys.exit(1)
-        return self.client.get(f"{self.base}/get_item/{uuid}")
+        return self.client.get(url)
 
-    def reconfigure(self, data: dict, params: dict):
-        return self.client.post(f"{self.base}/reconfigure")
+    def get_item(self, params):
+        """
+        GET /api/interfaces/vip_settings/get_item/<uuid>
+        """
+        uuid = params["uuid"]
 
-    def search_item(self, data: dict, params: dict):
-        return self.client.post(f"{self.base}/search_item", json=data)
+        url = f"{self.base}/get_item/{uuid}"
 
-    def set(self, data: dict, params: dict):
-        return self.client.post(f"{self.base}/set", json=data)
+        return self.client.get(url)
 
-    def set_item(self, data: dict, params: dict):
-        uuid = params.get('uuid', None)
-        if not uuid :
-            logging.error('no uuid parameter')
-            sys.exit(1)
-        return self.client.post(f"{self.base}/set_item/{uuid}")
+    def reconfigure(self):
+        """
+        POST /api/interfaces/vip_settings/reconfigure
+        """
+        url = f"{self.base}/reconfigure"
 
+        return self.client.post(url)
+
+    def search_item(self, data=None):
+        """
+        POST /api/interfaces/vip_settings/search_item
+        """
+        url = f"{self.base}/search_item"
+
+        return self.client.post(
+            url,
+            json=data,
+        )
+
+    def set(self, data):
+        """
+        POST /api/interfaces/vip_settings/set
+        """
+        url = f"{self.base}/set"
+
+        return self.client.post(
+            url,
+            json=data,
+        )
+
+    def set_item(self, data, params):
+        """
+        POST /api/interfaces/vip_settings/set_item/<uuid>
+        """
+        uuid = params["uuid"]
+
+        url = f"{self.base}/set_item/{uuid}"
+
+        return self.client.post(
+            url,
+            json=data,
+        )
