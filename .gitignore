@@ -3,7 +3,6 @@ config.conf
 work/
 apikey.shrc
 config.shrc
-opncli
 
 *~
 .python-version
