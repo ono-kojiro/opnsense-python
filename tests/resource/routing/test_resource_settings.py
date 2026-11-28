@@ -64,7 +64,20 @@ def test_get_gateway_by_name(mock_get_gateway):
 @patch(
     "opnsense.api.routing.settings.SettingsAPI.set_gateway"
 )
-def test_set_gateway_by_name(mock_set_gateway):
+@patch(
+    "opnsense.api.routing.settings.SettingsAPI.get_gateway"
+)
+def test_set_gateway_by_name(
+    mock_get_gateway,
+    mock_set_gateway,
+):
+
+    mock_get_gateway.return_value = {
+        "gateway_item": {
+            "name": "WAN_GW",
+            "disabled": "0",
+        }
+    }
 
     settings = Settings(None)
 
@@ -92,14 +105,25 @@ def test_set_gateway_by_name(mock_set_gateway):
         }
     )
 
-    mock_set_gateway.assert_called_once_with(
-        data,
+    mock_get_gateway.assert_called_once_with(
         {
             "name": "WAN_GW",
             "uuid": "11111111",
         }
     )
 
+    mock_set_gateway.assert_called_once_with(
+        {
+            "gateway_item": {
+                "name": "WAN_GW",
+                "disabled": "1",
+            }
+        },
+        {
+            "name": "WAN_GW",
+            "uuid": "11111111",
+        }
+    )
 
 @patch(
     "opnsense.api.routing.settings.SettingsAPI.del_gateway"
