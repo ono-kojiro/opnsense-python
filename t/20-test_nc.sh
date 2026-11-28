@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./common.shrc
+
 num=$(cat testcase.yml | yq -c '.testcases | length')
 num_test=$(expr $num \* 3)
 
