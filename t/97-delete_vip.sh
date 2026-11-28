@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./common.shrc
+
 num=$(cat vips.yml | yq -c '.vips | length')
 num_test=$(expr $num \* 2 + 2)
 
@@ -11,7 +13,7 @@ cat vips.yml | yq -c '.vips[]' |
         iface=$(echo "$item" | jq -r '.interface')
         nw=$(echo "$item" | jq -r '.network')
         descr=$(echo "$item" | jq -r '.descr')
-        opncli interfaces vip_settings del_item --descr="$descr" > result.json
+        $opncli interfaces vip_settings del_item --descr="$descr" > result.json
         if [ "$?" -eq 0 ]; then
             echo "ok - opncli passed"
         else
@@ -34,7 +36,7 @@ cat vips.yml | yq -c '.vips[]' |
 
 
 rm -f result.json
-opncli interfaces vip_settings reconfigure > result.json
+$opncli interfaces vip_settings reconfigure > result.json
 if [ "$?" -eq 0 ]; then
     echo "ok - opncli passed"
 else

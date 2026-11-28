@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./common.shrc
+
 num=$(cat filters.yml | yq -c '.filters | length')
 num_test=$(expr $num \* 2 + 2)
 
@@ -9,7 +11,7 @@ cat filters.yml | yq -c '.filters[]' |
     while read -r item; do
         descr=$(echo "$item" | jq -r '.description')
 
-        opncli firewall filter del_rule --descr="$descr" \
+        $opncli firewall filter del_rule --descr="$descr" \
 			> result.json 2>/dev/null
 
         if [ "$?" -eq 0 ]; then
@@ -33,7 +35,7 @@ cat filters.yml | yq -c '.filters[]' |
     done
 
 rm -f result.json
-opncli firewall filter apply \
+$opncli firewall filter apply \
 	> result.json 2>/dev/null
 
 if [ "$?" -eq 0 ]; then

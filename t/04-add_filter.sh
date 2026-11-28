@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./common.shrc
+
 num=$(cat filters.yml | yq -c '.filters | length')
 num_test=$(expr $num \* 2 + 2)
 
@@ -24,7 +26,7 @@ cat filters.yml | yq -c '.filters[]' |
         sequence=$(echo "$item" | jq -r '.sequence')
 
         #cmd="opncli -d firewall filter add_rule"
-        cmd="opncli firewall filter add_rule"
+        cmd="$opncli firewall filter add_rule"
 
         cmd="$cmd description=\"$descr\""
         cmd="$cmd categories=\"$categories\""
@@ -66,7 +68,7 @@ cat filters.yml | yq -c '.filters[]' |
 
 
 rm -f result.json
-opncli firewall filter apply > result.json
+$opncli firewall filter apply > result.json
 if [ "$?" -eq 0 ]; then
     echo "ok - opncli passed"
 else

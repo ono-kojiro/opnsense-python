@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. ./common.shrc
 
 num=$(cat aliases.yml | yq -c '.aliases | length')
 num_test=$(expr $num \* 2 + 2)
@@ -14,7 +15,7 @@ cat aliases.yml | yq -c '.aliases[]' |
         content=$(echo "$item" | jq -r '.content')
         enabled=$(echo "$item" | jq -r '.enabled')
         description=$(echo "$item" | jq -r '.description')
-        opncli firewall alias add_item \
+        $opncli firewall alias add_item \
             name="$name" \
             type="$tname" \
             content="$content" \
@@ -39,7 +40,7 @@ cat aliases.yml | yq -c '.aliases[]' |
 
 
 rm -f result.json
-opncli firewall alias reconfigure > result.json
+$opncli firewall alias reconfigure > result.json
 if [ "$?" -eq 0 ]; then
     echo "ok - opncli passed"
 else

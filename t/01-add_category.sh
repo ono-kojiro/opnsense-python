@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./common.shrc
+
 num=$(cat categories.yml | yq -c '.categories | length')
 # alias x2 + 2
 num_test=$(expr $num \* 2)
@@ -11,18 +13,19 @@ cat categories.yml | yq -c '.categories[]' |
         name=$(echo "$item" | jq -r '.name')
         color=$(echo "$item" | jq -r '.color')
         rm -f result.json
-        opncli firewall category add name=$name color=$color > result.json
+        $opncli firewall category add name=$name color=$color > result.json
         if [ "$?" -eq 0 ]; then
-            echo "ok - opncli passed"
+            echo "ok - opncli command passed"
         else
-            echo "not ok - opncli failed"
+            echo "not ok - opncli command failed"
         fi
 
-        res=`cat result.json | jq -r ".result"`
-        if [ "$res" = "saved" ]; then
-            echo "ok - $category: $res"
+        result=$(cat result.json | jq -r ".result")
+        if [ "$result" = "saved" ]; then
+            echo "ok - result: $result"
         else
-            echo "not ok - $category: $res"
+            reason=$(cat result.json | jq -r ".validations[]")
+            echo "not ok - result: $result, reason: $reason"
         fi
 done
 
